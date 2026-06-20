@@ -1,0 +1,99 @@
+<Window x:Class="App2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App2"
+        mc:Ignorable="d"
+        Title="نظام إدارة المبيعات" Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F7FA"
+        FlowDirection="RightToLeft">
+
+    <Window.Resources>
+        <Style TargetType="RadioButton" x:Key="NavButtonStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#64748B"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Margin" Value="0,4"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F8FAFC"/>
+                    <Setter Property="Foreground" Value="#0F172A"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#EFF6FF"/>
+                    <Setter Property="Foreground" Value="#2563EB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/> <!-- Sidebar -->
+            <ColumnDefinition Width="*"/>   <!-- Main Content -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Logo/Title -->
+                <StackPanel Grid.Row="0" Margin="24,32,24,32" Orientation="Horizontal">
+                    <TextBlock Text="📊" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                    <TextBlock Text="النظام الشامل" FontSize="22" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Navigation Links -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="16,0">
+                        <TextBlock Text="القائمة الرئيسية" FontSize="12" Foreground="#64748B" FontWeight="Bold" Margin="16,0,0,12"/>
+                        
+                        <RadioButton Content="🏠 لوحة التحكم" Style="{StaticResource NavButtonStyle}" Command="{Binding GoToDashboardCommand}" IsChecked="True"/>
+                        <RadioButton Content="💼 دليل الحسابات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageAccountsCommand}"/>
+                        <RadioButton Content="👥 إدارة العملاء" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageCustomersCommand}"/>
+                        <RadioButton Content="📦 إدارة المخزون" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageInventoryCommand}"/>
+                        <RadioButton Content="🛒 فاتورة مبيعات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageSalesInvoicesCommand}"/>
+                        <RadioButton Content="🧾 سجل المشتريات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManagePurchaseInvoicesCommand}"/>
+                        
+                        <!-- These commands aren't fully implemented with views yet, but they exist in ViewModel -->
+                        <RadioButton Content="➕ إضافة طلب جديد" Style="{StaticResource NavButtonStyle}" Command="{Binding AddOrderCommand}"/>
+                        <RadioButton Content="📦 إدارة المنتجات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageProductsCommand}"/>
+                        <RadioButton Content="📊 التقارير" Style="{StaticResource NavButtonStyle}" Command="{Binding ReportsCommand}"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Settings at bottom -->
+                <StackPanel Grid.Row="2" Margin="16,24">
+                    <RadioButton Content="⚙️ الإعدادات" Style="{StaticResource NavButtonStyle}" Command="{Binding SettingsCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Border Grid.Column="1" Background="#F8FAFC">
+            <!-- This will display the CurrentView property from MainViewModel -->
+            <ContentControl Content="{Binding CurrentView}" Margin="0"/>
+        </Border>
+    </Grid>
+</Window>
