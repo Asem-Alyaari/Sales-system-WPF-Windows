@@ -18,7 +18,7 @@ namespace App2.Data.Configurations
                 .IsRequired();
 
             builder.Property(p => p.ContainerNumber)
-                .IsRequired()
+                .IsRequired(false)
                 .HasMaxLength(50);
 
             builder.Property(p => p.Category)

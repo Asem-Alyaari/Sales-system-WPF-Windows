@@ -9,9 +9,7 @@ namespace App2.ViewModels
         public int ProductId { get; set; }
         public string ColorNumber { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
-        public int TotalQuantity { get; set; } // إجمالي العدد بوحدة الكبة
-        public decimal TotalWeight { get; set; } // إجمالي الوزن
-        public List<InventoryBatchItem> Batches { get; set; } = new();
+        public int TotalQuantity { get; set; } // دائماً بوحدة الكبة
 
         // إجمالي الكراتين للعرض
         public int TotalCartons => TotalQuantity / Inventory.KabbaPerCarton;
@@ -28,12 +26,11 @@ namespace App2.ViewModels
     public class InventoryBatchItem
     {
         public int Id { get; set; }
-        public int Quantity { get; set; } // الكمية بوحدة الكبة
+        public string BatchName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
         public string Unit { get; set; } = "كبة";
-        public decimal Weight { get; set; }
         public string InvoiceNumber { get; set; } = string.Empty;
         public DateTime DateAdded { get; set; }
-        public string BatchName { get; set; } = string.Empty; // مثل: دفعة 1، دفعة 2
 
         // إجمالي الكراتين لهذه الدفعة
         public int Cartons => Quantity / Inventory.KabbaPerCarton;

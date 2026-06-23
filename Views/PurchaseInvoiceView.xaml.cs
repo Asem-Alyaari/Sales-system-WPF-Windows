@@ -260,12 +260,7 @@ namespace App2.Views
                     DataObject.AddPastingHandler(textBox, QuantityTextBox_Pasting);
                     textBox.PreviewKeyDown += TextBox_PreviewKeyDown_BlockSpace;
                 }
-                else if (header == "الوزن")
-                {
-                    textBox.PreviewTextInput += WeightTextBox_PreviewTextInput;
-                    DataObject.AddPastingHandler(textBox, WeightTextBox_Pasting);
-                    textBox.PreviewKeyDown += TextBox_PreviewKeyDown_BlockSpace;
-                }
+
             }
         }
 
@@ -280,62 +275,6 @@ namespace App2.Views
             {
                 string text = (string)e.DataObject.GetData(DataFormats.Text);
                 if (!text.All(char.IsDigit))
-                {
-                    e.CancelCommand();
-                }
-            }
-            else
-            {
-                e.CancelCommand();
-            }
-        }
-
-        private void WeightTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                string currentText = textBox.Text;
-                int selectionStart = textBox.SelectionStart;
-                int selectionLength = textBox.SelectionLength;
-
-                string proposedText = currentText.Remove(selectionStart, selectionLength)
-                                                 .Insert(selectionStart, e.Text);
-
-                e.Handled = !IsValidDecimal(proposedText);
-            }
-        }
-
-        private static bool IsValidDecimal(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return true;
-
-            if (text == "." || text == ",")
-                return true;
-
-            string cleanText = text.Replace(',', '.');
-
-            int dotCount = cleanText.Count(c => c == '.');
-            if (dotCount > 1)
-                return false;
-
-            return cleanText.All(c => char.IsDigit(c) || c == '.');
-        }
-
-        private void WeightTextBox_Pasting(object sender, DataObjectPastingEventArgs e)
-        {
-            if (sender is TextBox textBox && e.DataObject.GetDataPresent(DataFormats.Text))
-            {
-                string pasteText = (string)e.DataObject.GetData(DataFormats.Text);
-
-                string currentText = textBox.Text;
-                int selectionStart = textBox.SelectionStart;
-                int selectionLength = textBox.SelectionLength;
-
-                string proposedText = currentText.Remove(selectionStart, selectionLength)
-                                                 .Insert(selectionStart, pasteText);
-
-                if (!IsValidDecimal(proposedText))
                 {
                     e.CancelCommand();
                 }

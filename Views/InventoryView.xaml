@@ -217,15 +217,6 @@
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource EmeraldStatCard}" Margin="8,0,0,0" BorderBrush="#10B981">
-                <StackPanel>
-                    <TextBlock Text="إجمالي الوزن القائم" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
-                        <TextBlock Text="{Binding TotalWeight, StringFormat=N2}" FontSize="26" FontWeight="Bold" Foreground="#10B981"/>
-                        <TextBlock Text=" كغ" FontSize="13" FontWeight="SemiBold" Foreground="#94A3B8" Margin="4,0,0,4" VerticalAlignment="Bottom"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
         </Grid>
 
         <!-- ========== SEARCH BAR ========== -->
@@ -304,7 +295,6 @@
                           Background="Transparent"
                           SelectionMode="Single"
                           SelectionUnit="FullRow"
-                          RowDetailsVisibilityMode="VisibleWhenSelected"
                           VerticalContentAlignment="Center">
 
                     <DataGrid.Columns>
@@ -348,137 +338,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="إجمالي الوزن (كغ)"
-                                            Binding="{Binding TotalWeight, StringFormat=N2}"
-                                            Width="160">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontWeight" Value="ExtraBold"/>
-                                    <Setter Property="FontSize" Value="16"/>
-                                    <Setter Property="Foreground" Value="#10B981"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="عدد الدفعات"
-                                            Binding="{Binding Batches.Count}"
-                                            Width="120">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                    <Setter Property="FontSize" Value="15"/>
-                                    <Setter Property="Foreground" Value="#64748B"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
                     </DataGrid.Columns>
-
-                    <!-- RowDetailsTemplate -->
-                    <DataGrid.RowDetailsTemplate>
-                        <DataTemplate>
-                            <Border Background="#F8FAFC"
-                                    BorderBrush="#E2E8F0"
-                                    BorderThickness="0,1,0,1"
-                                    Padding="30,16,30,20"
-                                    Margin="0">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                        <TextBlock Text="تفاصيل دفعات الموردين للخيط:" FontSize="14" Foreground="#64748B" VerticalAlignment="Center"/>
-                                        <TextBlock Text="{Binding ColorNumber}" FontSize="15" FontWeight="Bold" Foreground="#10B981" Margin="8,0,0,0" VerticalAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <!-- Sub DataGrid (Batches) -->
-                                    <DataGrid ItemsSource="{Binding Batches}"
-                                              AutoGenerateColumns="False"
-                                              CanUserAddRows="False"
-                                              CanUserDeleteRows="False"
-                                              GridLinesVisibility="Horizontal"
-                                              HorizontalGridLinesBrush="#E2E8F0"
-                                              HeadersVisibility="Column"
-                                              ColumnHeaderStyle="{StaticResource EmeraldSubHeader}"
-                                              BorderBrush="#E2E8F0"
-                                              BorderThickness="1"
-                                              Background="#FFFFFF"
-                                              AlternationCount="2"
-                                              IsReadOnly="True"
-                                              MaxHeight="250">
-
-                                        <DataGrid.RowStyle>
-                                            <Style TargetType="DataGridRow">
-                                                <Setter Property="Background" Value="#FFFFFF"/>
-                                                <Setter Property="Foreground" Value="#334155"/>
-                                                <Setter Property="MinHeight" Value="36"/>
-                                                <Setter Property="FontSize" Value="14"/>
-                                                <Style.Triggers>
-                                                    <Trigger Property="AlternationIndex" Value="1">
-                                                        <Setter Property="Background" Value="#F8FAFC"/>
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </DataGrid.RowStyle>
-
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="رقم الدفعة" Binding="{Binding BatchName}" Width="120">
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                                        <Setter Property="FontWeight" Value="Bold"/>
-                                                        <Setter Property="Foreground" Value="#475569"/>
-                                                    </Style>
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-
-                                            <DataGridTextColumn Header="الكمية" Binding="{Binding DisplayQuantity}" Width="150">
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                                        <Setter Property="FontWeight" Value="Bold"/>
-                                                    </Style>
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-
-                                            <DataGridTextColumn Header="الوزن الصافي (كغ)" Binding="{Binding Weight, StringFormat=N2}" Width="140">
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                                        <Setter Property="Foreground" Value="#059669"/>
-                                                        <Setter Property="FontWeight" Value="Bold"/>
-                                                        <Setter Property="FontSize" Value="15"/>
-                                                    </Style>
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-
-                                            <DataGridTextColumn Header="رقم الفاتورة" Binding="{Binding InvoiceNumber}" Width="140">
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                                    </Style>
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-
-                                            <DataGridTextColumn Header="تاريخ الإضافة" Binding="{Binding DateAdded, StringFormat=dd/MM/yyyy}" Width="120">
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="HorizontalAlignment" Value="Center"/>
-                                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                                        <Setter Property="Foreground" Value="#94A3B8"/>
-                                                    </Style>
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </DataGrid.RowDetailsTemplate>
                 </DataGrid>
             </Grid>
         </Border>

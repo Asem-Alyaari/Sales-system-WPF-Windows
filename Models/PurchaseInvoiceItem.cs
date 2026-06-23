@@ -9,7 +9,6 @@ namespace App2.Models
         private string _color = string.Empty;
         private int _quantity;
         private string _unit = "كرتون";
-        private decimal _weight;
         private int _purchaseInvoiceId;
         private PurchaseInvoice? _purchaseInvoice;
 
@@ -43,11 +42,7 @@ namespace App2.Models
             set => SetProperty(ref _unit, value);
         }
 
-        public decimal Weight
-        {
-            get => _weight;
-            set => SetProperty(ref _weight, value);
-        }
+
 
         public int PurchaseInvoiceId
         {
@@ -65,13 +60,12 @@ namespace App2.Models
         {
         }
 
-        public PurchaseInvoiceItem(string boxNumber, string color, int quantity, string unit, decimal weight, int purchaseInvoiceId)
+        public PurchaseInvoiceItem(string boxNumber, string color, int quantity, string unit, int purchaseInvoiceId)
         {
             BoxNumber = boxNumber;
             Color = color;
             Quantity = quantity;
             Unit = unit;
-            Weight = weight;
             PurchaseInvoiceId = purchaseInvoiceId;
         }
     }

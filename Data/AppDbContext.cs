@@ -1,6 +1,7 @@
 using App2.Data.Configurations;
 using App2.Models;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 
 namespace App2.Data
 {
@@ -16,19 +17,24 @@ namespace App2.Data
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
         public DbSet<PurchaseInvoiceItem> PurchaseInvoiceItems { get; set; }
-        
+
         public DbSet<SalesInvoice> SalesInvoices { get; set; }
         public DbSet<SalesInvoiceDetail> SalesInvoiceDetails { get; set; }
-        
+
         public DbSet<Account> Accounts { get; set; }
         public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
         public DbSet<FinancialTransactionLine> FinancialTransactionLines { get; set; }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<License> Licenses { get; set; }
+        public DbSet<IssuedKey> IssuedKeys { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=.;Database=App2Db;Trusted_Connection=True;TrustServerCertificate=True;");
+                var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App2Db.db");
+                optionsBuilder.UseSqlite($"Data Source={dbPath}");
             }
         }
 

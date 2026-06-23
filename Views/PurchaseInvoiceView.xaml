@@ -282,7 +282,6 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellEditingTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="الوزن" Binding="{Binding Weight, UpdateSourceTrigger=LostFocus}" ElementStyle="{StaticResource DataGridTextBoxStyle}" Width="140"/>
 
                         <DataGridTemplateColumn Header="إجراء" Width="100">
                             <DataGridTemplateColumn.CellTemplate>

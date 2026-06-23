@@ -2,13 +2,12 @@ namespace App2.Models
 {
     public class Inventory
     {
-        public const int KabbaPerCarton = 12;
+        public const int KabbaPerCarton = 20;
 
         public int Id { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; } // دائماً بوحدة الكبة
         public string Unit { get; set; } = "كبة"; 
-        public decimal? TotalWeight { get; set; }
         public DateTime DateAdded { get; set; } = DateTime.Now;
         public string InvoiceNumber { get; set; } = string.Empty;
 
@@ -18,7 +17,7 @@ namespace App2.Models
         {
         }
 
-        public Inventory(int productId, int quantity, string unit, decimal? totalWeight, string invoiceNumber = "")
+        public Inventory(int productId, int quantity, string unit, string invoiceNumber = "")
         {
             ProductId = productId;
             // التحويل إلى كبة إذا كانت الوحدة كرتون
@@ -32,7 +31,6 @@ namespace App2.Models
                 Quantity = quantity;
                 Unit = "كبة";
             }
-            TotalWeight = totalWeight;
             InvoiceNumber = invoiceNumber;
             DateAdded = DateTime.Now;
         }

@@ -66,6 +66,20 @@ namespace App2.ViewModels
             RemoveItemCommand = new RelayCommand(ExecuteRemoveItem);
             SaveInvoiceCommand = new RelayCommand(ExecuteSaveInvoice, CanExecuteSaveInvoice);
             ClearCommand = new RelayCommand(ExecuteClear);
+
+            // توليد رقم الفاتورة تلقائياً
+            InvoiceNumber = GenerateInvoiceNumber();
+        }
+
+        private string GenerateInvoiceNumber()
+        {
+            // البحث عن آخر رقم فاتورة في قاعدة البيانات
+            var lastInvoice = _dbContext.PurchaseInvoices
+                .OrderByDescending(i => i.Id)
+                .FirstOrDefault();
+
+            int nextNumber = (lastInvoice?.Id ?? 0) + 1;
+            return $"PUR-{DateTime.Now:yyyy}-{nextNumber:D4}";
         }
 
         public void SearchProducts(string searchTerm)
@@ -100,8 +114,7 @@ namespace App2.ViewModels
                 BoxNumber = string.Empty,
                 Color = string.Empty,
                 Quantity = 1,
-                Unit = "كرتون",
-                Weight = 0
+                Unit = "كرتون"
             });
         }
 
@@ -116,7 +129,6 @@ namespace App2.ViewModels
         private bool CanExecuteSaveInvoice(object? parameter)
         {
             return !string.IsNullOrWhiteSpace(InvoiceNumber) &&
-                   !string.IsNullOrWhiteSpace(ContainerNumber) &&
                    InvoiceItems.Any();
         }
 
@@ -128,11 +140,7 @@ namespace App2.ViewModels
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(ContainerNumber))
-            {
-                System.Windows.MessageBox.Show("الرجاء إدخال رقم الحاوية", "تنبيه", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
-                return;
-            }
+
 
             var validItems = InvoiceItems.Where(i => !string.IsNullOrWhiteSpace(i.BoxNumber)).ToList();
 
@@ -197,20 +205,30 @@ namespace App2.ViewModels
                         }
                     }
 
-                    // إضافة سجل المخزون
+                    // إضافة سجل المخزون أو تحديثه
                     int quantityInKabba = item.Unit == "كرتون" ? item.Quantity * Inventory.KabbaPerCarton : item.Quantity;
                     
-                    var inventoryRecord = new Inventory
+                    var existingInventory = _dbContext.Inventories.Local.FirstOrDefault(i => i.Product == currentProduct)
+                                            ?? _dbContext.Inventories.FirstOrDefault(i => i.Product == currentProduct);
+
+                    if (existingInventory != null)
                     {
-                        Product = currentProduct,
-                        Quantity = quantityInKabba,
-                        Unit = "كبة",
-                        TotalWeight = item.Weight,
-                        InvoiceNumber = invoice.InvoiceNumber,
-                        DateAdded = DateTime.Now
-                    };
-                    
-                    _dbContext.Inventories.Add(inventoryRecord);
+                        existingInventory.Quantity += quantityInKabba;
+                        existingInventory.DateAdded = DateTime.Now;
+                        existingInventory.InvoiceNumber = invoice.InvoiceNumber;
+                    }
+                    else
+                    {
+                        var inventoryRecord = new Inventory
+                        {
+                            Product = currentProduct,
+                            Quantity = quantityInKabba,
+                            Unit = "كبة",
+                            InvoiceNumber = invoice.InvoiceNumber,
+                            DateAdded = DateTime.Now
+                        };
+                        _dbContext.Inventories.Add(inventoryRecord);
+                    }
                 }
 
                 _dbContext.SaveChanges();
@@ -257,7 +275,7 @@ namespace App2.ViewModels
 
         private void ClearFields()
         {
-            InvoiceNumber = string.Empty;
+            InvoiceNumber = GenerateInvoiceNumber();
             InvoiceDate = DateTime.Now;
             ContainerNumber = string.Empty;
             Category = null;

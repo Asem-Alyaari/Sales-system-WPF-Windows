@@ -164,13 +164,8 @@
                 <StackPanel>
                     <TextBlock Text="⚡ إجراءات سريعة" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,20"/>
 
-                    <Button Content="➕ إضافة طلب جديد" Command="{Binding AddOrderCommand}" Margin="0,0,0,10"/>
-                    <Button Content="📦 إدارة المنتجات" Command="{Binding ManageProductsCommand}" Margin="0,0,0,10" Background="#27AE60"/>
-                    <Button Content="👥 إدارة العملاء" Command="{Binding ManageCustomersCommand}" Margin="0,0,0,10" Background="#E74C3C"/>
-                    <Button Content="🧾 سجل المشتريات" Command="{Binding ManagePurchaseInvoicesCommand}" Margin="0,0,0,10" Background="#9B59B6"/>
-                    <Button Content="📦 إدارة المخزون" Command="{Binding ManageInventoryCommand}" Margin="0,0,0,10" Background="#0EA5E9"/>
-                    <Button Content="📊 التقارير" Command="{Binding ReportsCommand}" Margin="0,0,0,10" Background="#F39C12"/>
-                    <Button Content="⚙️ الإعدادات" Command="{Binding SettingsCommand}" Background="#95A5A6"/>
+                    <Button Content="🧾 فاتورة مبيعات" Command="{Binding ManageSalesInvoicesCommand}" Margin="0,0,0,10" Background="#27AE60"/>
+                    <Button Content="� فاتورة مشتريات" Command="{Binding AddPurchaseInvoiceCommand  }" Margin="0,0,0,10" Background="#9B59B6"/>
                 </StackPanel>
             </Border>
         </Grid>

@@ -136,7 +136,6 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="رقم الكرتون" Binding="{Binding BoxNumber}" Width="*"/>
                         <DataGridTextColumn Header="اللون" Binding="{Binding Color}" Width="*"/>
-                        <DataGridTextColumn Header="الوزن" Binding="{Binding Weight}" Width="*"/>
                         <DataGridTextColumn Header="الكمية" Binding="{Binding Quantity}" Width="*"/>
                         <DataGridTextColumn Header="الوحدة" Binding="{Binding Unit}" Width="*"/>
                     </DataGrid.Columns>

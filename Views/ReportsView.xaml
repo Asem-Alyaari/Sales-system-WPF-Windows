@@ -1,0 +1,311 @@
+<UserControl x:Class="App2.Views.ReportsView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Background="#F8FAFC"
+        FlowDirection="RightToLeft"
+        Loaded="ReportsView_Loaded">
+
+    <UserControl.Resources>
+        <!-- Modern Card Style -->
+        <Style x:Key="ModernCard" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="6" ShadowDepth="1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Emerald Clean Stat Card -->
+        <Style x:Key="EmeraldStatCard" TargetType="Border">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="#10B981"/>
+            <Setter Property="BorderThickness" Value="4,0,0,0"/>
+            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="6" ShadowDepth="1"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Emerald Primary Button -->
+        <Style x:Key="EmeraldBtn" TargetType="Button">
+            <Setter Property="Background" Value="#10B981"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#059669"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid Column Header Style -->
+        <Style x:Key="EmeraldHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Padding" Value="12,14"/>
+            <Setter Property="BorderBrush" Value="#E2E8F0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <!-- DataGrid Row Style -->
+        <Style x:Key="EmeraldRow" TargetType="DataGridRow">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="Foreground" Value="#334155"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="MinHeight" Value="48"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="BorderBrush" Value="#F1F5F9"/>
+            <Style.Triggers>
+                <Trigger Property="AlternationIndex" Value="1">
+                    <Setter Property="Background" Value="#F8FAFC"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#D1FAE5"/>
+                    <Setter Property="Foreground" Value="#065F46"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#ECFDF5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="20,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HEADER -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Border Background="#D1FAE5" CornerRadius="8" Width="42" Height="42" Margin="0,0,12,0">
+                    <TextBlock Text="📊" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="تقارير المبيعات والمدفوعات" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
+                    <TextBlock Text="نظرة عامة على المبيعات والمدفوعات حسب الفترة" FontSize="13" Foreground="#64748B" Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Grid.Column="1" 
+                    Content="تحديث البيانات  🔄"
+                    Command="{Binding RefreshCommand}"
+                    Style="{StaticResource EmeraldBtn}"
+                    VerticalAlignment="Center"/>
+        </Grid>
+
+        <!-- DATE FILTER -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,12" Padding="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="من تاريخ:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
+                <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                
+                <TextBlock Grid.Column="2" Text="إلى تاريخ:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
+                <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- FINANCIAL SUMMARY CARDS -->
+        <Grid Grid.Row="2" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource EmeraldStatCard}" Margin="0,0,4,0" BorderBrush="#10B981">
+                <StackPanel>
+                    <TextBlock Text="البيع النقدي" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayCashSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#F59E0B">
+                <StackPanel>
+                    <TextBlock Text="البيع الآجل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayDeferredSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#3B82F6">
+                <StackPanel>
+                    <TextBlock Text="البيع التحويل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayTransferSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#8B5CF6">
+                <StackPanel>
+                    <TextBlock Text="السداد النقدي" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayCashPayments}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="4" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#EC4899">
+                <StackPanel>
+                    <TextBlock Text="السداد التحويل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayTransferPayments}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="5" Style="{StaticResource EmeraldStatCard}" Margin="4,0,0,0" BorderBrush="#6366F1">
+                <StackPanel>
+                    <TextBlock Text="إجمالي الكمية المباعة" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayTotalQuantitySold}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- TOTAL SUMMARY -->
+        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Margin="0,0,0,12" Padding="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="#D1FAE5" CornerRadius="8" Padding="16" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="إجمالي المبيعات" FontSize="14" FontWeight="SemiBold" Foreground="#065F46" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding FinancialSummary.DisplayTotalSales}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Background="#DBEAFE" CornerRadius="8" Padding="16" Margin="8,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="إجمالي المدفوعات" FontSize="14" FontWeight="SemiBold" Foreground="#1E40AF" Margin="0,0,0,8"/>
+                        <TextBlock Text="{Binding FinancialSummary.DisplayTotalPayments}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- PRODUCT SALES TABLE -->
+        <Border Grid.Row="4" Style="{StaticResource ModernCard}" Padding="4">
+            <Grid>
+                <!-- Loading Indicator -->
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="10">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="جاري جلب بيانات التقارير..." FontSize="16" FontWeight="Bold" Foreground="#10B981" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                    <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#10B981" Background="#D1FAE5" BorderThickness="0"/>
+                </StackPanel>
+
+                <DataGrid x:Name="ProductSalesDataGrid"
+                          ItemsSource="{Binding ProductSales}"
+                          AutoGenerateColumns="False"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          GridLinesVisibility="None"
+                          HeadersVisibility="Column"
+                          AlternationCount="2"
+                          RowStyle="{StaticResource EmeraldRow}"
+                          ColumnHeaderStyle="{StaticResource EmeraldHeader}"
+                          BorderThickness="0"
+                          Background="Transparent"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          VerticalContentAlignment="Center">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="الصنف"
+                                            Binding="{Binding Color}"
+                                            Width="*">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="15"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="الكمية المباعة"
+                                            Binding="{Binding DisplayQuantity}"
+                                            Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="16"/>
+                                    <Setter Property="Foreground" Value="#0F172A"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <DataGridTextColumn Header="المبلغ"
+                                            Binding="{Binding DisplayAmount}"
+                                            Width="180">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="ExtraBold"/>
+                                    <Setter Property="FontSize" Value="16"/>
+                                    <Setter Property="Foreground" Value="#10B981"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -20,8 +20,6 @@ namespace App2.Views
 
             NameTextBox.Text = customer.Name;
             PhoneTextBox.Text = customer.Phone;
-            AddressTextBox.Text = customer.Address;
-            CreditLimitTextBox.Text = customer.CreditLimit.ToString();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -38,20 +36,12 @@ namespace App2.Views
                 return;
             }
 
-            if (!decimal.TryParse(CreditLimitTextBox.Text, out var creditLimit))
-            {
-                MessageBox.Show("الرجاء إدخال حد ائتماني صحيح", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
             if (_originalCustomer == null)
             {
                 Customer = new Customer
                 {
                     Name = NameTextBox.Text.Trim(),
                     Phone = PhoneTextBox.Text.Trim(),
-                    Address = AddressTextBox.Text.Trim(),
-                    CreditLimit = creditLimit,
                     Balance = 0,
                     AddedDate = DateTime.Now,
                     Account = new Account
@@ -67,8 +57,18 @@ namespace App2.Views
             {
                 _originalCustomer.Name = NameTextBox.Text.Trim();
                 _originalCustomer.Phone = PhoneTextBox.Text.Trim();
-                _originalCustomer.Address = AddressTextBox.Text.Trim();
-                _originalCustomer.CreditLimit = creditLimit;
+
+                // التأكد من وجود حساب للعميل الحالي
+                if (!_originalCustomer.AccountId.HasValue && _originalCustomer.Account == null)
+                {
+                    _originalCustomer.Account = new Account
+                    {
+                        Name = $"عميل - {_originalCustomer.Name}",
+                        AccountType = AccountType.Asset,
+                        IsActive = true,
+                        CreatedDate = DateTime.Now
+                    };
+                }
             }
 
             DialogResult = true;

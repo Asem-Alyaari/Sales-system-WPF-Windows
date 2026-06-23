@@ -10,5 +10,14 @@ namespace App2.Views
             InitializeComponent();
             DataContext = new CustomersViewModel();
         }
+
+        private async void UserControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            // تحميل البيانات بعد فتح الواجهة
+            if (DataContext is CustomersViewModel viewModel)
+            {
+                await viewModel.LoadDataAsync();
+            }
+        }
     }
 }

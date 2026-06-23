@@ -42,18 +42,6 @@
 
             <!-- Actions -->
             <StackPanel Grid.Column="1" Orientation="Horizontal">
-                <Button Command="{Binding AddAccountCommand}" Margin="0,0,8,0" Padding="16,8" Background="#2563EB" Foreground="White" BorderThickness="0">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="➕" Margin="0,0,8,0"/>
-                        <TextBlock Text="إضافة حساب"/>
-                    </StackPanel>
-                </Button>
-                <Button Command="{Binding EditAccountCommand}" Margin="0,0,8,0" Padding="16,8" Background="#F59E0B" Foreground="White" BorderThickness="0">
-                    <TextBlock Text="✏️ تعديل"/>
-                </Button>
-                <Button Command="{Binding DeleteAccountCommand}" Margin="0,0,8,0" Padding="16,8" Background="#EF4444" Foreground="White" BorderThickness="0">
-                    <TextBlock Text="🗑️ حذف"/>
-                </Button>
                 <Button Command="{Binding RefreshCommand}" Padding="16,8" Background="#64748B" Foreground="White" BorderThickness="0">
                     <TextBlock Text="🔄 تحديث"/>
                 </Button>
@@ -89,6 +77,20 @@
                     <DataGridTextColumn Header="النوع" Binding="{Binding AccountType}" Width="150"/>
                     <DataGridCheckBoxColumn Header="نشط" Binding="{Binding IsActive}" Width="100"/>
                     <DataGridTextColumn Header="تاريخ الإنشاء" Binding="{Binding CreatedDate, StringFormat=yyyy/MM/dd}" Width="150"/>
+                    <DataGridTemplateColumn Header="إجراءات" Width="120">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Command="{Binding DataContext.ViewStatementCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                        CommandParameter="{Binding}" 
+                                        Content="عرض كشف"
+                                        Padding="12,6"
+                                        Background="#10B981"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        FontSize="13"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

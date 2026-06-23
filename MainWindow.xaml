@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:App2"
         mc:Ignorable="d"
         Title="نظام إدارة المبيعات" Height="800" Width="1400"
+        Icon="Resources/app_icon.ico"
         WindowStartupLocation="CenterScreen"
         Background="#F5F7FA"
         FlowDirection="RightToLeft">
@@ -61,7 +62,7 @@
                 <!-- Logo/Title -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,32" Orientation="Horizontal">
                     <TextBlock Text="📊" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <TextBlock Text="النظام الشامل" FontSize="22" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                    <TextBlock Text="ادارة المخازن" FontSize="22" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- Navigation Links -->
@@ -73,19 +74,53 @@
                         <RadioButton Content="💼 دليل الحسابات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageAccountsCommand}"/>
                         <RadioButton Content="👥 إدارة العملاء" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageCustomersCommand}"/>
                         <RadioButton Content="📦 إدارة المخزون" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageInventoryCommand}"/>
-                        <RadioButton Content="🛒 فاتورة مبيعات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageSalesInvoicesCommand}"/>
+                        <RadioButton Content="🧾 سجل المبيعات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageSalesLogCommand}"/>
                         <RadioButton Content="🧾 سجل المشتريات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManagePurchaseInvoicesCommand}"/>
                         
                         <!-- These commands aren't fully implemented with views yet, but they exist in ViewModel -->
-                        <RadioButton Content="➕ إضافة طلب جديد" Style="{StaticResource NavButtonStyle}" Command="{Binding AddOrderCommand}"/>
-                        <RadioButton Content="📦 إدارة المنتجات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageProductsCommand}"/>
                         <RadioButton Content="📊 التقارير" Style="{StaticResource NavButtonStyle}" Command="{Binding ReportsCommand}"/>
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Settings at bottom -->
-                <StackPanel Grid.Row="2" Margin="16,24">
+                <!-- Bottom: User Info + Settings + Logout -->
+                <StackPanel Grid.Row="2" Margin="16,16,16,24">
+                    <Rectangle Fill="#F1F5F9" Height="1" Margin="0,0,0,16"/>
+
+                    <!-- User Info -->
+                    <Border Background="#F8FAFC" CornerRadius="12" Padding="12" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Background="#EFF6FF" CornerRadius="20" Width="38" Height="38" Margin="0,0,10,0">
+                                <TextBlock Text="👤" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentFullName}" FontSize="13" FontWeight="Bold" Foreground="#1E293B"/>
+                                <TextBlock Text="{Binding CurrentUsername}" FontSize="11" Foreground="#64748B"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
                     <RadioButton Content="⚙️ الإعدادات" Style="{StaticResource NavButtonStyle}" Command="{Binding SettingsCommand}"/>
+
+                    <!-- Logout Button -->
+                    <Button Command="{Binding LogoutCommand}" Cursor="Hand" Margin="0,4,0,0"
+                            Background="Transparent" BorderThickness="0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border x:Name="Bd" Background="Transparent" CornerRadius="8" Padding="16,10">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="🚪" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="تسجيل الخروج" FontSize="14" FontWeight="SemiBold"
+                                                   Foreground="#EF4444" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#FEF2F2"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>

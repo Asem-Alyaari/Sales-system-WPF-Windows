@@ -9,7 +9,6 @@ namespace App2.Models
         private UnitType _unit;
         private decimal _price;
         private decimal _totalPrice;
-        private decimal _weight;
 
         public int Id { get; set; }
         
@@ -71,24 +70,11 @@ namespace App2.Models
             set => SetProperty(ref _totalPrice, value);
         } 
 
-        [NotMapped]
-        public decimal Weight
-        {
-            get => _weight;
-            set => SetProperty(ref _weight, value);
-        }
-
-        [NotMapped]
-        public decimal BatchWeightPerKabba { get; set; }
-        
         public string ItemName { get; set; } = string.Empty; 
 
         private void UpdateCalculations()
         {
             TotalPrice = Quantity * Price;
-            
-            int multiplier = Unit == UnitType.Carton ? Inventory.KabbaPerCarton : 1;
-            Weight = Quantity * multiplier * BatchWeightPerKabba;
         }
     }
 }

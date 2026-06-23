@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:App2.Views"
         mc:Ignorable="d"
         Background="#F8FAFC"
-        FlowDirection="RightToLeft">
+        FlowDirection="RightToLeft"
+        Loaded="UserControl_Loaded">
 
     <UserControl.Resources>
         <Style x:Key="ModernCard" TargetType="Border">
@@ -157,7 +158,7 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="إدارة العملاء" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
-                        <TextBlock Text="إضافة، تعديل، وإدارة بيانات وأرصدة العملاء" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock Text="إضافة، تعديل، وإدارة بيانات العملاء" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </StackPanel>
 
@@ -183,7 +184,7 @@
                              Background="Transparent"
                              FontSize="14" Padding="12,10"/>
 
-                    <TextBlock Text="🔍 ابحث بالاسم، رقم الجوال، أو العنوان..."
+                    <TextBlock Text="🔍 ابحث بالاسم أو رقم الجوال..."
                                IsHitTestVisible="False"
                                VerticalAlignment="Center"
                                Margin="16,0,0,0"
@@ -245,7 +246,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="رقم الجوال" Binding="{Binding Phone}" Width="140">
+                        <DataGridTextColumn Header="رقم الجوال" Binding="{Binding Phone}" Width="180">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -254,38 +255,7 @@
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="العنوان" Binding="{Binding Address}" Width="180">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="Margin" Value="10,0"/>
-                                    <Setter Property="Foreground" Value="#64748B"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="الحد الائتماني" Binding="{Binding CreditLimit, StringFormat=N2}" Width="140">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="الرصيد" Binding="{Binding Balance, StringFormat=N2}" Width="140">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Center"/>
-                                    <Setter Property="VerticalAlignment" Value="Center"/>
-                                    <Setter Property="FontWeight" Value="ExtraBold"/>
-                                    <Setter Property="Foreground" Value="#10B981"/>
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-
-                        <DataGridTextColumn Header="تاريخ الإضافة" Binding="{Binding AddedDate, StringFormat=dd/MM/yyyy}" Width="130">
+                        <DataGridTextColumn Header="تاريخ الإضافة" Binding="{Binding AddedDate, StringFormat=dd/MM/yyyy}" Width="160">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -294,6 +264,20 @@
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
                         </DataGridTextColumn>
+                        
+                        <DataGridTemplateColumn Header="إجراءات" Width="120">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="💵 دفع" 
+                                            Command="{Binding DataContext.MakePaymentCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                            CommandParameter="{Binding}" 
+                                            Style="{StaticResource EmeraldBtn}"
+                                            Padding="12,6"
+                                            Height="Auto"
+                                            FontSize="14"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -307,7 +291,7 @@
                         <Button Content="🗑️ حذف العميل" 
                                 Command="{Binding DeleteCustomerCommand}" 
                                 Style="{StaticResource DangerBtn}" 
-                                Width="140"/>
+                                Width="140" Margin="0,0,12,0"/>
                     </StackPanel>
                 </Border>
             </Grid>

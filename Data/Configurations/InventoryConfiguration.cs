@@ -17,9 +17,7 @@ namespace App2.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(20);
 
-            builder.Property(i => i.TotalWeight)
-                .IsRequired(false)
-                .HasPrecision(18, 2);
+           
 
             builder.Property(i => i.DateAdded)
                 .IsRequired();

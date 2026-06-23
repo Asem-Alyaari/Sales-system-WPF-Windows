@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,9 +18,7 @@ namespace App2
     {
         public MainWindow()
         {
-            InitializeComponent();   
-                   DataContext = new MainViewModel();
-
+            InitializeComponent();
         }
     }
 }

@@ -15,6 +15,8 @@ namespace App2.ViewModels
         private Customer? _selectedCustomer;
         private readonly AppDbContext _dbContext;
 
+        public event Action<Customer?>? OnCustomerStatementRequested;
+
         public string SearchText
         {
             get => _searchText;
@@ -38,6 +40,8 @@ namespace App2.ViewModels
         public ICommand EditCustomerCommand { get; }
         public ICommand DeleteCustomerCommand { get; }
         public ICommand RefreshCommand { get; }
+        public ICommand CustomerStatementCommand { get; }
+        public ICommand MakePaymentCommand { get; }
 
         public CustomersViewModel()
         {
@@ -48,11 +52,29 @@ namespace App2.ViewModels
             EditCustomerCommand = new RelayCommand(ExecuteEditCustomer, CanExecuteEditDelete);
             DeleteCustomerCommand = new RelayCommand(ExecuteDeleteCustomer, CanExecuteEditDelete);
             RefreshCommand = new RelayCommand(ExecuteRefresh);
+            CustomerStatementCommand = new RelayCommand(ExecuteCustomerStatement, CanExecuteCustomerStatement);
+            MakePaymentCommand = new RelayCommand(ExecuteMakePayment, CanExecuteEditDelete);
 
-            LoadCustomersAsync();
+            // لا تقم بتحميل البيانات هنا - سيتم تحميلها من حدث Loaded في الواجهة
         }
 
-        private async void LoadCustomersAsync()
+        public async System.Threading.Tasks.Task LoadDataAsync()
+        {
+            await LoadCustomersAsync();
+        }
+
+        private void ExecuteMakePayment(object? parameter)
+        {
+            if (parameter is Customer customer)
+            {
+                var window = new Views.PaymentReceiptWindow(_dbContext, customer);
+                window.ShowDialog();
+            }
+        }
+
+        private async 
+        Task
+LoadCustomersAsync()
         {
             try
             {
@@ -80,8 +102,7 @@ namespace App2.ViewModels
                 ? AllCustomers
                 : AllCustomers.Where(c =>
                     c.Name.Contains(SearchText) ||
-                    c.Phone.Contains(SearchText) ||
-                    c.Address.Contains(SearchText));
+                    c.Phone.Contains(SearchText));
 
             foreach (var customer in filtered)
             {
@@ -92,6 +113,16 @@ namespace App2.ViewModels
         private bool CanExecuteEditDelete(object? parameter)
         {
             return SelectedCustomer != null;
+        }
+
+        private bool CanExecuteCustomerStatement(object? parameter)
+        {
+            return SelectedCustomer != null;
+        }
+
+        private void ExecuteCustomerStatement(object? parameter)
+        {
+            OnCustomerStatementRequested?.Invoke(SelectedCustomer);
         }
 
         private void ExecuteAddCustomer(object? parameter)

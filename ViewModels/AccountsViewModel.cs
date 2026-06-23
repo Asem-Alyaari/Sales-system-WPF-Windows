@@ -17,6 +17,8 @@ namespace App2.ViewModels
         private Account? _selectedAccount;
         private readonly AppDbContext _dbContext;
 
+        public event Action<Account?>? OnAccountStatementRequested;
+
         public string SearchText
         {
             get => _searchText;
@@ -36,9 +38,7 @@ namespace App2.ViewModels
         public ObservableCollection<Account> Accounts { get; } = new();
         public ObservableCollection<Account> AllAccounts { get; } = new();
 
-        public ICommand AddAccountCommand { get; }
-        public ICommand EditAccountCommand { get; }
-        public ICommand DeleteAccountCommand { get; }
+        public ICommand ViewStatementCommand { get; }
         public ICommand RefreshCommand { get; }
 
         public AccountsViewModel()
@@ -46,9 +46,7 @@ namespace App2.ViewModels
             var factory = new AppDbContextFactory();
             _dbContext = factory.CreateDbContext(null);
 
-            AddAccountCommand = new RelayCommand(ExecuteAddAccount);
-            EditAccountCommand = new RelayCommand(ExecuteEditAccount, CanExecuteEditDelete);
-            DeleteAccountCommand = new RelayCommand(ExecuteDeleteAccount, CanExecuteEditDelete);
+            ViewStatementCommand = new RelayCommand(ExecuteViewStatement);
             RefreshCommand = new RelayCommand(ExecuteRefresh);
 
             LoadAccountsAsync();
@@ -90,64 +88,11 @@ namespace App2.ViewModels
             }
         }
 
-        private bool CanExecuteEditDelete(object? parameter)
+        private void ExecuteViewStatement(object? parameter)
         {
-            return SelectedAccount != null;
-        }
-
-        private void ExecuteAddAccount(object? parameter)
-        {
-            var dialog = new AccountDialog();
-            if (dialog.ShowDialog() == true)
+            if (parameter is Account account)
             {
-                var newAccount = dialog.Account;
-                if (newAccount != null)
-                {
-                    _dbContext.Accounts.Add(newAccount);
-                    _dbContext.SaveChanges();
-                    AllAccounts.Add(newAccount);
-                    FilterAccounts();
-                }
-            }
-        }
-
-        private void ExecuteEditAccount(object? parameter)
-        {
-            if (SelectedAccount != null)
-            {
-                var dialog = new AccountDialog(SelectedAccount);
-                if (dialog.ShowDialog() == true)
-                {
-                    _dbContext.SaveChanges();
-                    FilterAccounts();
-                }
-            }
-        }
-
-        private void ExecuteDeleteAccount(object? parameter)
-        {
-            if (SelectedAccount != null)
-            {
-                var result = MessageBox.Show(
-                    "هل أنت متأكد من حذف هذا الحساب؟",
-                    "تأكيد الحذف",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    bool hasTransactions = _dbContext.FinancialTransactionLines.Any(l => l.AccountId == SelectedAccount.Id);
-                    if (hasTransactions)
-                    {
-                        MessageBox.Show("لا يمكن حذف هذا الحساب لأن عليه حركات مالية.", "حذف حساب", MessageBoxButton.OK, MessageBoxImage.Warning);
-                        return;
-                    }
-
-                    _dbContext.Accounts.Remove(SelectedAccount);
-                    _dbContext.SaveChanges();
-                    AllAccounts.Remove(SelectedAccount);
-                    FilterAccounts();
-                }
+                OnAccountStatementRequested?.Invoke(account);
             }
         }
 

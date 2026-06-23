@@ -19,8 +19,6 @@ namespace App2.ViewModels
         private int _totalProducts;
         private int _totalCartons;
         private int _totalRemainingKabba;
-        private decimal _totalWeight;
-
         public string SearchText
         {
             get => _searchText;
@@ -55,11 +53,7 @@ namespace App2.ViewModels
             set => SetProperty(ref _totalRemainingKabba, value);
         }
 
-        public decimal TotalWeight
-        {
-            get => _totalWeight;
-            set => SetProperty(ref _totalWeight, value);
-        }
+
 
         private ObservableCollection<InventorySummaryItem> _inventoryItems = new();
         public ObservableCollection<InventorySummaryItem> InventoryItems
@@ -110,34 +104,16 @@ namespace App2.ViewModels
                         var product = group.First().Product;
                         if (product == null) continue;
 
-                        var activeBatches = group.Where(i => i.Quantity > 0).OrderBy(i => i.DateAdded).ToList();
-                        
-                        // Optionally skip products with zero quantity entirely
-                        if (!activeBatches.Any()) continue;
+                        var activeRecord = group.FirstOrDefault(i => i.Quantity > 0);
+                        if (activeRecord == null) continue;
 
                         var summaryItem = new InventorySummaryItem
                         {
                             ProductId = product.Id,
                             ColorNumber = product.ColorNumber,
                             Color = product.Color ?? string.Empty,
-                            TotalQuantity = activeBatches.Sum(i => i.Quantity),
-                            TotalWeight = activeBatches.Sum(i => i.TotalWeight ?? 0)
+                            TotalQuantity = activeRecord.Quantity
                         };
-
-                        for (int j = 0; j < activeBatches.Count; j++)
-                        {
-                            var batch = activeBatches[j];
-                            summaryItem.Batches.Add(new InventoryBatchItem
-                            {
-                                Id = batch.Id,
-                                Quantity = batch.Quantity,
-                                Unit = batch.Unit,
-                                Weight = batch.TotalWeight ?? 0,
-                                InvoiceNumber = batch.InvoiceNumber,
-                                DateAdded = batch.DateAdded,
-                                BatchName = $"دفعة {j + 1}"
-                            });
-                        }
 
                         result.Add(summaryItem);
                     }
@@ -179,7 +155,6 @@ namespace App2.ViewModels
             int totalKabba = _allItems.Sum(i => i.TotalQuantity);
             TotalCartons = totalKabba / Inventory.KabbaPerCarton;
             TotalRemainingKabba = totalKabba % Inventory.KabbaPerCarton;
-            TotalWeight = _allItems.Sum(i => i.TotalWeight);
         }
 
         private void ExecuteRefresh(object? parameter)
@@ -188,7 +163,6 @@ namespace App2.ViewModels
             InventoryItems = new ObservableCollection<InventorySummaryItem>();
             TotalProducts = 0;
             TotalCartons = 0;
-            TotalWeight = 0;
             _ = LoadDataAsync();
         }
     }

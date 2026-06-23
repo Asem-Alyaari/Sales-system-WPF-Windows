@@ -13,6 +13,8 @@ namespace App2.ViewModels
     {
         private readonly AppDbContext _dbContext;
         private string _searchText = string.Empty;
+        private DateTime _startDate;
+        private DateTime _endDate;
 
         public ObservableCollection<PurchaseInvoice> Invoices { get; set; } = new();
 
@@ -28,6 +30,30 @@ namespace App2.ViewModels
             }
         }
 
+        public DateTime StartDate
+        {
+            get => _startDate;
+            set
+            {
+                if (SetProperty(ref _startDate, value))
+                {
+                    FilterInvoices();
+                }
+            }
+        }
+
+        public DateTime EndDate
+        {
+            get => _endDate;
+            set
+            {
+                if (SetProperty(ref _endDate, value))
+                {
+                    FilterInvoices();
+                }
+            }
+        }
+
         public ICommand RefreshCommand { get; }
         public ICommand AddInvoiceCommand { get; }
         public ICommand ViewInvoiceCommand { get; }
@@ -36,6 +62,10 @@ namespace App2.ViewModels
         {
             var factory = new AppDbContextFactory();
             _dbContext = factory.CreateDbContext(null);
+
+            var today = DateTime.Today;
+            _startDate = new DateTime(today.Year, today.Month, 1);
+            _endDate = today;
 
             RefreshCommand = new RelayCommand(_ => LoadInvoices());
             AddInvoiceCommand = new RelayCommand(ExecuteAddInvoice);
@@ -47,8 +77,12 @@ namespace App2.ViewModels
         private void LoadInvoices()
         {
             Invoices.Clear();
+            var startDate = StartDate.Date;
+            var endDate = EndDate.Date.AddDays(1).AddTicks(-1);
+
             var invoices = _dbContext.PurchaseInvoices
                 .Include(i => i.Items)
+                .Where(i => i.InvoiceDate >= startDate && i.InvoiceDate <= endDate)
                 .OrderByDescending(i => i.InvoiceDate)
                 .ToList();
 
@@ -60,22 +94,24 @@ namespace App2.ViewModels
 
         private void FilterInvoices()
         {
-            if (string.IsNullOrWhiteSpace(SearchText))
-            {
-                LoadInvoices();
-                return;
-            }
+            var startDate = StartDate.Date;
+            var endDate = EndDate.Date.AddDays(1).AddTicks(-1);
 
             var query = _dbContext.PurchaseInvoices
                 .Include(i => i.Items)
-                .Where(i => i.InvoiceNumber.Contains(SearchText) || 
+                .Where(i => i.InvoiceDate >= startDate && i.InvoiceDate <= endDate);
+
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                query = query.Where(i => i.InvoiceNumber.Contains(SearchText) || 
                             i.ContainerNumber.Contains(SearchText) || 
-                            (i.Category != null && i.Category.Contains(SearchText)))
-                .OrderByDescending(i => i.InvoiceDate)
-                .ToList();
+                            (i.Category != null && i.Category.Contains(SearchText)));
+            }
+
+            var invoices = query.OrderByDescending(i => i.InvoiceDate).ToList();
 
             Invoices.Clear();
-            foreach (var invoice in query)
+            foreach (var invoice in invoices)
             {
                 Invoices.Add(invoice);
             }

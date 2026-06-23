@@ -159,16 +159,25 @@
             </Grid>
         </Border>
 
-        <!-- Search -->
+        <!-- Search and Date Filter -->
         <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,24" Padding="20">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="300"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="300"/>
                 </Grid.ColumnDefinitions>
-                
-                <TextBox Grid.Column="0" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Grid.Column="0" Text="ابحث برقم الفاتورة أو الحاوية..." Foreground="#94A3B8" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0">
+
+                <TextBlock Grid.Column="0" Text="من:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
+                <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" VerticalAlignment="Center" Margin="0,0,16,0" Width="120"/>
+
+                <TextBlock Grid.Column="2" Text="إلى:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
+                <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" VerticalAlignment="Center" Margin="0,0,16,0" Width="120"/>
+
+                <TextBox Grid.Column="4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Column="4" Text="ابحث برقم الفاتورة أو الحاوية..." Foreground="#94A3B8" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Hidden"/>
@@ -192,14 +201,15 @@
                     <DataGridTextColumn Header="رقم الحاوية" Binding="{Binding ContainerNumber}" Width="*"/>
                     <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="*"/>
                     
-                    <DataGridTemplateColumn Header="إجراءات" Width="Auto">
+                    <DataGridTemplateColumn Width="100">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="👁️ عرض التفاصيل" Command="{Binding DataContext.ViewInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource EmeraldBtn}" Margin="5,0"/>
-                                </StackPanel>
+                                <Button Content="👁️ عرض" 
+                                        Command="{Binding DataContext.ViewInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                        CommandParameter="{Binding}"
+                                        Style="{StaticResource EmeraldBtn}"
+                                        Padding="10,5"
+                                        Height="Auto"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>

@@ -25,9 +25,7 @@ namespace App2.Data.Configurations
                 .IsRequired()
                 .HasMaxLength(20);
 
-            builder.Property(i => i.Weight)
-                .IsRequired()
-                .HasPrecision(18, 2);
+          
 
             builder.HasOne(i => i.PurchaseInvoice)
                 .WithMany(p => p.Items)
