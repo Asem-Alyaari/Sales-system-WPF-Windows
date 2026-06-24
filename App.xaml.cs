@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Linq;
 using App2.ViewModels;
 using App2.Views;
 using App2.Data;
@@ -11,6 +12,14 @@ namespace App2
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+            // التحقق مما إذا كان المطور يريد تشغيل مولد المفاتيح
+            if (e.Args.Contains("--gen"))
+            {
+                var generator = new LicenseGeneratorView();
+                generator.Show();
+                return;
+            }
+
             // تهيئة قاعدة البيانات وإنشاء المستخدم الافتراضي
             InitializeDatabase();
 
@@ -66,14 +75,7 @@ namespace App2
                 return true;
             }
 
-            if (licenseCheck.Status == LicenseService.LicenseStatus.NeedsActivation)
-            {
-                // لا يسمح بالدخول بدون ترخيص صالح
-                // يجب على المستخدم تفعيل الترخيص أولاً
-                MessageBox.Show("يرجى تفعيل النظام باستخدام مفتاح ترخيص صادر من النظام قبل الدخول", "تنبيه", 
-                    MessageBoxButton.OK, MessageBoxImage.Warning);
-                return false;
-            }
+
 
             if (licenseCheck.Status == LicenseService.LicenseStatus.InvalidDevice)
             {

@@ -10,7 +10,7 @@ namespace App2.Models
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(50)]
+        [MaxLength(2048)]
         public string LicenseKey { get; set; } = string.Empty;
 
         [Required]

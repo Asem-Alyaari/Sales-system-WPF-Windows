@@ -96,11 +96,11 @@ namespace App2.Views
             }
         }
 
-        private void GenerateLicenseKey_Click(object sender, RoutedEventArgs e)
-        {
-            var expiryDate = ExpiryDatePicker.SelectedDate;
-            var licenseKey = LicenseService.GenerateLicenseKey(expiryDate);
-            LicenseKeyTextBox.Text = licenseKey;
-        }
+        //private void GenerateLicenseKey_Click(object sender, RoutedEventArgs e)
+        //{
+        //    var expiryDate = ExpiryDatePicker.SelectedDate;
+        //    var licenseKey = LicenseService.GenerateLicenseKey(expiryDate);
+        //    LicenseKeyTextBox.Text = licenseKey;
+        //}
     }
 }

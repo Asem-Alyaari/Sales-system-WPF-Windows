@@ -10,6 +10,22 @@ namespace App2.Views
         public LicenseActivationView()
         {
             InitializeComponent();
+            LoadHardwareId();
+        }
+
+        private void LoadHardwareId()
+        {
+            string hardwareId = HardwareIdService.GetHardwareId();
+            HardwareIdTextBox.Text = hardwareId;
+        }
+
+        private void CopyHardwareIdButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(HardwareIdTextBox.Text))
+            {
+                Clipboard.SetText(HardwareIdTextBox.Text);
+                MessageBox.Show("تم نسخ معرف الجهاز إلى الحافظة!", "نجاح", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
         }
 
         private void ActivateButton_Click(object sender, RoutedEventArgs e)

@@ -170,38 +170,6 @@
             </Border>
 
             <!-- License Management Card -->
-            <Border x:Name="LicenseCard" Grid.Row="3" Style="{StaticResource CardStyle}">
-                <StackPanel>
-                    <TextBlock Text="🔐 إدارة التراخيص" FontSize="16" FontWeight="Bold" Foreground="#1E293B" Margin="0,0,0,20"/>
-
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="16"/>
-                            <ColumnDefinition Width="160"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="مفتاح الترخيص الجديد" Style="{StaticResource LabelStyle}"/>
-                            <TextBox x:Name="LicenseKeyTextBox" Style="{StaticResource InputBoxStyle}"
-                                     IsReadOnly="True" FontFamily="Consolas" TextAlignment="Center"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="تاريخ انتهاء الترخيص" Style="{StaticResource LabelStyle}"/>
-                            <DatePicker x:Name="ExpiryDatePicker" Height="44" VerticalAlignment="Bottom"
-                                        SelectedDate="{Binding Path=Today, Mode=OneTime}"/>
-                        </StackPanel>
-                        <Button Grid.Column="4" Content="🔄 إنشاء مفتاح"
-                                Style="{StaticResource PrimaryBtn}"
-                                Click="GenerateLicenseKey_Click"
-                                VerticalAlignment="Bottom"/>
-                    </Grid>
-
-                    <TextBlock Text="استخدم هذا المفتاح لتفعيل النظام للعملاء الجدد" 
-                               FontSize="12" Foreground="#64748B" Margin="0,12,0,0"/>
-                </StackPanel>
-            </Border>
         </Grid>
     </ScrollViewer>
 </UserControl>
