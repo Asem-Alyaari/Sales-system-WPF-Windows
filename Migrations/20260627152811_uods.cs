@@ -5,7 +5,7 @@
 namespace App2.Migrations
 {
     /// <inheritdoc />
-    public partial class IncreaseLicenseKeyLength : Migration
+    public partial class uods : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

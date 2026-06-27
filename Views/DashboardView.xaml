@@ -164,8 +164,9 @@
                 <StackPanel>
                     <TextBlock Text="⚡ إجراءات سريعة" FontSize="20" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,20"/>
 
-                    <Button Content="🧾 فاتورة مبيعات" Command="{Binding ManageSalesInvoicesCommand}" Margin="0,0,0,10" Background="#27AE60"/>
-                    <Button Content="� فاتورة مشتريات" Command="{Binding AddPurchaseInvoiceCommand  }" Margin="0,0,0,10" Background="#9B59B6"/>
+                    <Button Content="↩️ مرتجع مبيعات" Command="{Binding ManageSalesReturnCommand}" Margin="0,0,0,10" Background="#E67E22"/>
+                    <Button Content="🧾 فاتورة مبيعات" Command="{Binding ManageSalesInvoicesCommand}" Margin="0,0,0,10" Background="#3498DB"/>
+                    <Button Content="🧾 فاتورة مشتريات" Command="{Binding AddPurchaseInvoiceCommand  }" Margin="0,0,0,10" Background="#9B59B6"/>
                 </StackPanel>
             </Border>
         </Grid>

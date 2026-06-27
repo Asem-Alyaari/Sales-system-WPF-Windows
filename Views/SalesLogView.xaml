@@ -46,6 +46,23 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+        
+        <Style x:Key="AmberBtn" TargetType="Button" BasedOn="{StaticResource EmeraldBtn}">
+            <Setter Property="Background" Value="#F59E0B"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D97706"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="BlueBtn" TargetType="Button" BasedOn="{StaticResource EmeraldBtn}">
+            <Setter Property="Background" Value="#3B82F6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2563EB"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
         <Style TargetType="TextBox">
             <Setter Property="Padding" Value="12,10"/>
@@ -142,18 +159,22 @@
                     </Border>
                     <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="سجل المبيعات" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                        <TextBlock Text="عرض وإدارة فواتير المبيعات السابقة" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
+                        <TextBlock Text="عرض وإدارة فواتير المبيعات والمرتجعات" FontSize="14" Foreground="#64748B" Margin="0,4,0,0"/>
                     </StackPanel>
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="➕ إضافة فاتورة مبيعات" Command="{Binding AddInvoiceCommand}" Style="{StaticResource EmeraldBtn}" Width="180"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="➕ إضافة فاتورة مبيعات" Command="{Binding AddInvoiceCommand}" Style="{StaticResource EmeraldBtn}" Margin="0,0,8,0"/>
+                    <Button Content="↩️ إضافة فاتورة مرتجع" Command="{Binding AddReturnCommand}" Style="{StaticResource AmberBtn}"/>
+                </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Search and Date Filter -->
+        <!-- Search, Date and Type Filter -->
         <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,24" Padding="20">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
@@ -166,9 +187,28 @@
 
                 <TextBlock Grid.Column="2" Text="إلى:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
                 <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" VerticalAlignment="Center" Margin="0,0,16,0" Width="120"/>
+                
+                <ComboBox Grid.Column="4" 
+                          SelectedItem="{Binding SelectedFilterType}" 
+                          ItemsSource="{Binding FilterTypes}" 
+                          VerticalAlignment="Center" 
+                          Margin="0,0,16,0" 
+                          Width="150"
+                          Padding="8">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding DisplayName}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                    <ComboBox.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                        </Style>
+                    </ComboBox.Resources>
+                </ComboBox>
 
-                <TextBox Grid.Column="4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Grid.Column="4" Text="ابحث برقم الفاتورة أو العميل..." Foreground="#94A3B8" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0">
+                <TextBox Grid.Column="5" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock Grid.Column="5" Text="ابحث برقم الفاتورة أو العميل..." Foreground="#94A3B8" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Hidden"/>
@@ -185,13 +225,30 @@
 
         <!-- DataGrid -->
         <Border Grid.Row="2" Style="{StaticResource ModernCard}">
-                <DataGrid ItemsSource="{Binding Invoices}">
+                <DataGrid ItemsSource="{Binding Items}">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="رقم الفاتورة" Binding="{Binding InvoiceNumber}" Width="*"/>
-                        <DataGridTextColumn Header="التاريخ" Binding="{Binding InvoiceDate, StringFormat=yyyy/MM/dd}" Width="*"/>
-                        <DataGridTextColumn Header="العميل" Binding="{Binding Customer.Name}" Width="*"/>
-                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding Total, StringFormat=N2}" Width="*"/>
-                        <DataGridTextColumn Header="الآجل" Binding="{Binding Deferred, StringFormat=N2}" Width="*"/>
+                        <DataGridTextColumn Header="النوع" Binding="{Binding Type}" Width="120">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Type}" Value="Invoice">
+                                            <Setter Property="Text" Value="فاتورة مبيعات"/>
+                                            <Setter Property="Foreground" Value="#10B981"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="Return">
+                                            <Setter Property="Text" Value="مرتجع"/>
+                                            <Setter Property="Foreground" Value="#EF4444"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="رقم الفاتورة" Binding="{Binding Number}" Width="*"/>
+                        <DataGridTextColumn Header="التاريخ" Binding="{Binding Date, StringFormat=yyyy/MM/dd}" Width="*"/>
+                        <DataGridTextColumn Header="العميل" Binding="{Binding CustomerName}" Width="*"/>
+                        <DataGridTextColumn Header="طريقة الدفع" Binding="{Binding PaymentMethodDisplayName}" Width="*"/>
+                        <DataGridTextColumn Header="رقم الحوالة" Binding="{Binding TransferNumber, TargetNullValue='-'}" Width="*"/>
+                        <DataGridTextColumn Header="الإجمالي" Binding="{Binding TotalAmount, StringFormat=N2}" Width="*"/>
                         <DataGridTemplateColumn Width="100">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>

@@ -18,6 +18,8 @@ namespace App2.ViewModels
         public PurchaseInvoiceDetailsViewModel(PurchaseInvoice invoice)
         {
             _invoice = invoice;
+            // مسح العناصر الموجودة قبل إضافة العناصر الجديدة
+            Items.Clear();
             foreach (var item in invoice.Items)
             {
                 Items.Add(item);

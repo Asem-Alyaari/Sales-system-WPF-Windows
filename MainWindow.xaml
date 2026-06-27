@@ -62,7 +62,7 @@
                 <!-- Logo/Title -->
                 <StackPanel Grid.Row="0" Margin="24,32,24,32" Orientation="Horizontal">
                     <TextBlock Text="📊" FontSize="28" VerticalAlignment="Center" Margin="0,0,12,0"/>
-                    <TextBlock Text="ادارة المخازن" FontSize="22" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center"/>
+                    <TextBlock FontSize="22" FontWeight="Bold" Foreground="#1E293B" VerticalAlignment="Center" Text="ادارة المخزون"/>
                 </StackPanel>
 
                 <!-- Navigation Links -->
@@ -74,7 +74,7 @@
                         <RadioButton Content="💼 دليل الحسابات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageAccountsCommand}"/>
                         <RadioButton Content="👥 إدارة العملاء" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageCustomersCommand}"/>
                         <RadioButton Content="📦 إدارة المخزون" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageInventoryCommand}"/>
-                        <RadioButton Content="🧾 سجل المبيعات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageSalesLogCommand}"/>
+                        <RadioButton Content="🧾 إدارة المبيعات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManageSalesLogCommand}"/>
                         <RadioButton Content="🧾 سجل المشتريات" Style="{StaticResource NavButtonStyle}" Command="{Binding ManagePurchaseInvoicesCommand}"/>
                         
                         <!-- These commands aren't fully implemented with views yet, but they exist in ViewModel -->

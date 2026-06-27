@@ -30,8 +30,11 @@ namespace App2.Models
         public decimal Deferred { get; set; } 
         
         // التحويل
-        public decimal Transfer { get; set; } 
+        public decimal Transfer { get; set; }
         
+        // رقم الحوالة
+        public string? TransferNumber { get; set; }
+
         // تفاصيل الفاتورة
         public List<SalesInvoiceDetail> Details { get; set; } = new List<SalesInvoiceDetail>(); 
     }

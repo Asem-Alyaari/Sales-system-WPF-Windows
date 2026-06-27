@@ -154,10 +154,34 @@ LoadCustomersAsync()
             }
         }
 
-        private void ExecuteDeleteCustomer(object? parameter)
+        private async void ExecuteDeleteCustomer(object? parameter)
         {
             if (SelectedCustomer != null)
             {
+                // التحقق من وجود عمليات مرتبطة بالعميل
+                var hasSalesInvoices = await _dbContext.SalesInvoices
+                    .AnyAsync(s => s.CustomerId == SelectedCustomer.Id);
+                
+                var hasFinancialTransactions = await _dbContext.FinancialTransactionLines
+                    .AnyAsync(t => t.AccountId == SelectedCustomer.AccountId);
+
+                if (hasSalesInvoices || hasFinancialTransactions)
+                {
+                    string message = "لا يمكن حذف هذا العميل لأنه مرتبط بعمليات:\n";
+                    if (hasSalesInvoices)
+                        message += "- فواتير مبيعات\n";
+                    if (hasFinancialTransactions)
+                        message += "- قيود محاسبية\n";
+                    message += "\nيرجى حذف العمليات المرتبطة أولاً أو استخدام ميزة الأرشفة.";
+
+                    System.Windows.MessageBox.Show(
+                        message,
+                        "لا يمكن الحذف",
+                        System.Windows.MessageBoxButton.OK,
+                        System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
                 var result = System.Windows.MessageBox.Show(
                     "هل أنت متأكد من حذف هذا العميل؟",
                     "تأكيد الحذف",
@@ -167,7 +191,7 @@ LoadCustomersAsync()
                 if (result == System.Windows.MessageBoxResult.Yes)
                 {
                     _dbContext.Customers.Remove(SelectedCustomer);
-                    _dbContext.SaveChanges();
+                    await _dbContext.SaveChangesAsync();
                     AllCustomers.Remove(SelectedCustomer);
                     FilterCustomers();
                 }

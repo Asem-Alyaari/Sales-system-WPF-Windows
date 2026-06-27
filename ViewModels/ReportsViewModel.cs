@@ -113,13 +113,19 @@ namespace App2.ViewModels
 
             try
             {
-                var (productSales, financialSummary) = await Task.Run(() =>
+                Tuple<List<ProductSalesReport>, FinancialSummary> result = await Task.Run(() =>
                 {
                     var factory = new AppDbContextFactory();
                     using var db = factory.CreateDbContext(Array.Empty<string>());
 
                     var startDate = StartDate.Date;
                     var endDate = EndDate.Date.AddDays(1).AddTicks(-1);
+
+                    // جلب جميع المنتجات للبحث السريع
+                    var productsDict = db.Products
+                        .ToDictionary(p => p.Id, p => p);
+                    var productsByColorNumber = db.Products
+                        .ToDictionary(p => p.ColorNumber.ToLowerInvariant(), p => p);
 
                     // جلب فواتير المبيعات في الفترة المحددة
                     var salesInvoices = db.SalesInvoices
@@ -128,22 +134,178 @@ namespace App2.ViewModels
                         .AsNoTracking()
                         .ToList();
 
-                    // حساب الكمية المباعة من كل صنف
-                    var productSalesList = new List<ProductSalesReport>();
-                    var productGroups = salesInvoices
-                        .SelectMany(s => s.Details)
-                        .GroupBy(d => d.ItemName);
+                    // جلب المرتجعات في الفترة المحددة
+                    var salesReturns = db.SalesReturns
+                        .Include(r => r.Details)
+                        .Where(r => r.ReturnDate >= startDate && r.ReturnDate <= endDate)
+                        .AsNoTracking()
+                        .ToList();
 
-                    foreach (var group in productGroups)
+                    // استخدام قاموس لتجميع الكميات للمبيعات، المرتجعات، والاستبدالات
+                    var productData = new Dictionary<int, (decimal quantity, decimal amount)>();
+
+                    // إضافة المبيعات الأصلية
+                    foreach (var detail in salesInvoices.SelectMany(s => s.Details))
                     {
-                        var report = new ProductSalesReport
+                        // تحديد معرف المنتج
+                        int productId;
+                        
+                        if (detail.ProductId != 0)
                         {
-                            ColorNumber = group.Key,
-                            Color = group.Key,
-                            TotalQuantity = group.Sum(d => d.Quantity),
-                            TotalAmount = group.Sum(d => d.TotalPrice)
-                        };
-                        productSalesList.Add(report);
+                            productId = detail.ProductId;
+                        }
+                        else
+                        {
+                            // للبيانات القديمة، حاول العثور على المنتج باستخدام رقم الصنف
+                            if (productsByColorNumber.TryGetValue(detail.ThreadNumber.ToLowerInvariant(), out var productFromThread))
+                            {
+                                productId = productFromThread.Id;
+                            }
+                            else
+                            {
+                                // إذا لم يتم العثور على المنتج، استخدم معرف عشوائي أو قم بتعرفه بـ ThreadNumber's hash code
+                                productId = detail.ThreadNumber.GetHashCode();
+                            }
+                        }
+
+                        if (!productData.ContainsKey(productId))
+                        {
+                            productData[productId] = (0, 0);
+                        }
+
+                        // تحويل الكمية إلى الكبة (الوحدة الأساسية (d.Unit == UnitType.Carton ? detail.Quantity * Inventory.KabbaPerCarton : detail.Quantity;
+                        decimal quantityInKabba = detail.Unit == UnitType.Carton 
+                            ? detail.Quantity * Inventory.KabbaPerCarton 
+                            : detail.Quantity;
+
+                        productData[productId] = (
+                            productData[productId].quantity + quantityInKabba,
+                            productData[productId].amount + detail.TotalPrice
+                        );
+                    }
+
+                    // معالجة المرتجعات والاستبدالات
+                    foreach (var returnItem in salesReturns)
+                    {
+                        foreach (var detail in returnItem.Details)
+                        {
+                            // تحديد معرف المنتج
+                            int productId;
+                            
+                            if (detail.ProductId != 0)
+                            {
+                                productId = detail.ProductId;
+                            }
+                            else
+                            {
+                                // للبيانات القديمة، حاول العثور على المنتج باستخدام رقم الصنف
+                                if (productsByColorNumber.TryGetValue(detail.ThreadNumber.ToLowerInvariant(), out var productFromThread))
+                                {
+                                    productId = productFromThread.Id;
+                                }
+                                else
+                                {
+                                    productId = detail.ThreadNumber.GetHashCode();
+                                }
+                            }
+                            
+                            if (!productData.ContainsKey(productId))
+                            {
+                                productData[productId] = (0, 0);
+                            }
+
+                            // تحويل الكمية إلى الكبة
+                            decimal quantityInKabba = detail.GetQuantityInKabba();
+
+                            if (returnItem.Type == ReturnType.Return)
+                            {
+                                // للمرتجع: طرح الكمية والقيمة
+                                productData[productId] = (
+                                    productData[productId].quantity - quantityInKabba,
+                                    productData[productId].amount - detail.TotalPrice
+                                );
+                            }
+                            else if (returnItem.Type == ReturnType.Exchange)
+                            {
+                                // للاستبدال: إذا كان الصنف من الفاتورة الأصلية (له SalesInvoiceDetailId) → طرح (الحد الأقصى - الكمية)
+                                // وإلا → إضافة (الصنف الجديد)
+                                if (detail.SalesInvoiceDetailId.HasValue)
+                                {
+                                    decimal quantityToSubtract = detail.MaxReturnQuantityKabba - quantityInKabba;
+                                    productData[productId] = (
+                                        productData[productId].quantity - quantityToSubtract,
+                                        productData[productId].amount - detail.TotalPrice
+                                    );
+                                }
+                                else
+                                {
+                                    productData[productId] = (
+                                        productData[productId].quantity + quantityInKabba,
+                                        productData[productId].amount + detail.TotalPrice
+                                    );
+                                }
+                            }
+                        }
+                    }
+
+                    // تحويل القاموس إلى قائمة ProductSalesReport
+                    var productSalesList = new List<ProductSalesReport>();
+                    foreach (var (productId, (quantity, amount)) in productData)
+                    {
+                        // تجاهل الأصناف التي أصبحت كميتها صفر
+                        if (Math.Round(quantity, 2) != 0)
+                        {
+                            // جلب المنتج من جدول Products لاستخدام البيانات المحدثة
+                            string colorNumber = "";
+                            string color = "";
+                            
+                            if (productsDict.TryGetValue(productId, out var product))
+                            {
+                                colorNumber = product.ColorNumber;
+                                color = product.Color ?? "";
+                            }
+                            else
+                            {
+                                // إذا لم يتم العثور على المنتج، حاول العثور عليه من خلال مثال من تفاصيل الفاتورة
+                                SalesInvoiceDetail? sampleInvoiceDetail = salesInvoices
+                                    .SelectMany(i => i.Details)
+                                    .FirstOrDefault(d => 
+                                        (d.ProductId != 0 && d.ProductId == productId) || 
+                                        (d.ProductId == 0 && d.ThreadNumber.GetHashCode() == productId));
+                                
+                                if (sampleInvoiceDetail != null)
+                                {
+                                    colorNumber = sampleInvoiceDetail.ThreadNumber;
+                                    color = sampleInvoiceDetail.ItemName;
+                                }
+                                else
+                                {
+                                    SalesReturnDetail? sampleReturnDetail = salesReturns
+                                        .SelectMany(r => r.Details)
+                                        .FirstOrDefault(d => 
+                                            (d.ProductId != 0 && d.ProductId == productId) || 
+                                            (d.ProductId == 0 && d.ThreadNumber.GetHashCode() == productId));
+                                    
+                                    if (sampleReturnDetail != null)
+                                    {
+                                        colorNumber = sampleReturnDetail.ThreadNumber;
+                                        color = sampleReturnDetail.ItemName;
+                                    }
+                                }
+                            }
+                            
+                            if (!string.IsNullOrEmpty(colorNumber) || !string.IsNullOrEmpty(color))
+                            {
+                                productSalesList.Add(new ProductSalesReport
+                                {
+                                    ProductId = productId,
+                                    ColorNumber = colorNumber,
+                                    Color = color,
+                                    TotalQuantity = quantity,
+                                    TotalAmount = amount
+                                });
+                            }
+                        }
                     }
 
                     // حساب الملخص المالي
@@ -182,16 +344,16 @@ namespace App2.ViewModels
                     summary.CashPayments = cashPayments;
                     summary.TransferPayments = transferPayments;
 
-                    return (productSalesList, summary);
+                    return new Tuple<List<ProductSalesReport>, FinancialSummary>(productSalesList, summary);
                 });
 
                 ProductSales.Clear();
-                foreach (var item in productSales)
+                foreach (var item in result.Item1.OrderByDescending(p => p.TotalAmount))
                 {
                     ProductSales.Add(item);
                 }
 
-                FinancialSummary = financialSummary;
+                FinancialSummary = result.Item2;
             }
             catch (Exception ex)
             {

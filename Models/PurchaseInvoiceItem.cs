@@ -1,4 +1,7 @@
+using App2.Data;
 using App2.ViewModels;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 
 namespace App2.Models
 {
@@ -11,6 +14,7 @@ namespace App2.Models
         private string _unit = "كرتون";
         private int _purchaseInvoiceId;
         private PurchaseInvoice? _purchaseInvoice;
+        private bool _isNew;
 
         public int Id
         {
@@ -21,7 +25,13 @@ namespace App2.Models
         public string BoxNumber
         {
             get => _boxNumber;
-            set => SetProperty(ref _boxNumber, value);
+            set
+            {
+                if (SetProperty(ref _boxNumber, value))
+                {
+                    CheckIfProductIsNew();
+                }
+            }
         }
 
         public string Color
@@ -40,6 +50,26 @@ namespace App2.Models
         {
             get => _unit;
             set => SetProperty(ref _unit, value);
+        }
+
+        [NotMapped]
+        public bool IsNew
+        {
+            get => _isNew;
+            set => SetProperty(ref _isNew, value);
+        }
+
+        private void CheckIfProductIsNew()
+        {
+            if (string.IsNullOrWhiteSpace(_boxNumber))
+            {
+                IsNew = false;
+                return;
+            }
+
+            var factory = new AppDbContextFactory();
+            using var db = factory.CreateDbContext(null);
+            IsNew = !db.Products.Any(p => p.ColorNumber == _boxNumber);
         }
 
 

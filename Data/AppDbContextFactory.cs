@@ -10,7 +10,12 @@ namespace App2.Data
         public AppDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App2Db.db");
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "App2");
+            if (!Directory.Exists(appDataPath))
+            {
+                Directory.CreateDirectory(appDataPath);
+            }
+            var dbPath = Path.Combine(appDataPath, "App2Db.db");
             optionsBuilder.UseSqlite($"Data Source={dbPath}");
 
             return new AppDbContext(optionsBuilder.Options);

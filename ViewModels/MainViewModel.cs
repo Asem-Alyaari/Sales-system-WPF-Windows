@@ -93,6 +93,7 @@ namespace App2.ViewModels
 
         public ICommand ManageSalesInvoicesCommand { get; }
         public ICommand ManageSalesLogCommand { get; }
+        public ICommand ManageSalesReturnCommand { get; }
         public ICommand CustomerStatementCommand { get; }
 
         public ICommand LogoutCommand { get; }
@@ -113,6 +114,7 @@ namespace App2.ViewModels
             AddPurchaseInvoiceCommand = new RelayCommand(ExecuteAddPurchaseInvoice);
             ManageSalesInvoicesCommand = new RelayCommand(ExecuteManageSalesInvoices);
             ManageSalesLogCommand = new RelayCommand(ExecuteManageSalesLog);
+            ManageSalesReturnCommand = new RelayCommand(ExecuteManageSalesReturn);
             CustomerStatementCommand = new RelayCommand(ExecuteCustomerStatement);
             ManageInventoryCommand = new RelayCommand(ExecuteManageInventory);
             ManageAccountsCommand = new RelayCommand(ExecuteManageAccounts);
@@ -292,6 +294,16 @@ namespace App2.ViewModels
         private void ExecuteManageSalesLog(object? parameter)
         {
             CurrentView = GetOrCreateView("SalesLog", () => new SalesLogView());
+        }
+
+        private void ExecuteManageSalesReturn(object? parameter)
+        {
+            var view = GetOrCreateView("SalesReturn", () => new Views.SalesReturnView());
+            if (view.DataContext is ViewModels.SalesReturnViewModel viewModel)
+            {
+                viewModel.ReloadData();
+            }
+            CurrentView = view;
         }
 
         private void ExecuteCustomerStatement(object? parameter)

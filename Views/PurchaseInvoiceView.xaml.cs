@@ -22,6 +22,13 @@ namespace App2.Views
             InitializeComponent();
             _viewModel = new PurchaseInvoiceViewModel();
             DataContext = _viewModel;
+            
+            this.DataContextChanged += (s, e) => {
+                if (e.NewValue is PurchaseInvoiceViewModel vm)
+                {
+                    _viewModel = vm;
+                }
+            };
 
             _searchTimer = new DispatcherTimer
             {
@@ -64,6 +71,7 @@ namespace App2.Views
                 if (comboBox.DataContext is App2.Models.PurchaseInvoiceItem item)
                 {
                     item.Color = product.Color ?? string.Empty;
+                    item.IsNew = false;
                 }
             }
         }
@@ -118,6 +126,7 @@ namespace App2.Views
                 if (comboBox.DataContext is App2.Models.PurchaseInvoiceItem item)
                 {
                     item.Color = product.Color ?? string.Empty;
+                    item.IsNew = false;
                 }
             }
 

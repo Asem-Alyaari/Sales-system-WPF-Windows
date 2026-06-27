@@ -7,6 +7,10 @@ namespace App2.Models
         public DateTime InvoiceDate { get; set; } = DateTime.Now;
         public string? ContainerNumber { get; set; }
         public string? Category { get; set; }
+        public bool IsPosted { get; set; } = false;
+
+        [System.ComponentModel.DataAnnotations.Schema.NotMapped]
+        public string StatusText => IsPosted ? "مرحلة" : "غير مرحلة";
 
         public List<PurchaseInvoiceItem> Items { get; set; } = new List<PurchaseInvoiceItem>();
 

@@ -8,7 +8,7 @@
         Height="550" Width="400"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Background="#F8FAFC"
+        Background="#F1F5F9"
         FontFamily="Segoe UI"
         FlowDirection="RightToLeft">
 
@@ -17,13 +17,14 @@
             <Setter Property="Background" Value="#10B981"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Height" Value="45"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="10"
+                                CornerRadius="8"
                                 SnapsToDevicePixels="True">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
@@ -36,16 +37,18 @@
                 </Trigger>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Background" Value="#CBD5E1"/>
+                    <Setter Property="Foreground" Value="#94A3B8"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="InputStyle" TargetType="{x:Type Control}">
-            <Setter Property="Padding" Value="12,8"/>
+        <Style x:Key="SafeInputStyle" TargetType="{x:Type Control}">
+            <Setter Property="Padding" Value="12,0"/>
             <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Height" Value="45"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="#E2E8F0"/>
-            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Control}">
@@ -53,39 +56,65 @@
                                 BorderBrush="{TemplateBinding BorderBrush}" 
                                 BorderThickness="{TemplateBinding BorderThickness}" 
                                 CornerRadius="8">
-                            <ScrollViewer x:Name="PART_ContentHost" Margin="5,0"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="5,0" VerticalAlignment="Center"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                    <Setter Property="BorderBrush" Value="#10B981"/>
+                    <Setter Property="Background" Value="#FFFFFF"/>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Window.Resources>
 
-    <Grid Margin="40">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <Border Background="White" 
+                CornerRadius="12" 
+                Padding="25,30">
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,40" HorizontalAlignment="Center">
-            <Border Background="#ECFDF5" CornerRadius="12" Width="70" Height="70" Margin="0,0,0,15">
-                <TextBlock Text="🔒" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#10B981"/>
-            </Border>
-            <TextBlock Text="مرحباً بك مجدداً" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
-            <TextBlock Text="يرجى إدخال بيانات الدخول" FontSize="14" Foreground="#64748B" Margin="0,5,0,0"/>
-        </StackPanel>
+            <Border.Effect>
+                <DropShadowEffect Color="#0F172A" Opacity="0.06" BlurRadius="15" ShadowDepth="2"/>
+            </Border.Effect>
 
-        <StackPanel Grid.Row="1" VerticalAlignment="Center">
-            <TextBlock Text="اسم المستخدم" FontSize="13" FontWeight="Medium" Foreground="#475569" Margin="0,0,0,6"/>
-            <TextBox x:Name="UsernameTextBox" Style="{StaticResource InputStyle}" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" Height="45" Margin="0,0,0,20"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <TextBlock Text="كلمة المرور" FontSize="13" FontWeight="Medium" Foreground="#475569" Margin="0,0,0,6"/>
-            <PasswordBox x:Name="PasswordBox" Style="{StaticResource InputStyle}" Height="45" Margin="0,0,0,30" PasswordChanged="PasswordBox_PasswordChanged"/>
+                <StackPanel Grid.Row="0" Margin="0,0,0,30" HorizontalAlignment="Center">
+                    <Border Background="#ECFDF5" CornerRadius="12" Width="65" Height="65" Margin="0,0,0,15">
+                        <TextBlock Text="🔒" FontSize="28" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#10B981"/>
+                    </Border>
+                    <TextBlock Text="مرحباً بك مجدداً" FontSize="22" FontWeight="Bold" Foreground="#1E293B" HorizontalAlignment="Center"/>
+                    <TextBlock Text="يرجى إدخال بيانات الدخول" FontSize="13" Foreground="#64748B" Margin="0,5,0,0" HorizontalAlignment="Center"/>
+                </StackPanel>
 
-            <Button Content="تسجيل الدخول" Command="{Binding LoginCommand}" IsEnabled="{Binding IsLoginEnabled}" Height="48"/>
-        </StackPanel>
+                <StackPanel Grid.Row="1" VerticalAlignment="Center">
 
-        <TextBlock Grid.Row="2" Text="جميع الحقوق محفوظة © 2026" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+                    <TextBlock Text="اسم المستخدم" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <TextBox x:Name="UsernameTextBox" 
+                             Style="{StaticResource SafeInputStyle}" 
+                             Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}" 
+                             Margin="0,0,0,20"/>
+
+                    <TextBlock Text="كلمة المرور" FontSize="13" FontWeight="SemiBold" Foreground="#475569" Margin="0,0,0,8"/>
+                    <PasswordBox x:Name="PasswordBox" 
+                                 Style="{StaticResource SafeInputStyle}" 
+                                 Margin="0,0,0,30" 
+                                 PasswordChanged="PasswordBox_PasswordChanged"/>
+
+                    <Button Content="تسجيل الدخول" 
+                            Command="{Binding LoginCommand}" 
+                            IsEnabled="{Binding IsLoginEnabled}"/>
+                </StackPanel>
+
+                <TextBlock Grid.Row="2" Text="جميع الحقوق محفوظة © 2026" FontSize="12" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

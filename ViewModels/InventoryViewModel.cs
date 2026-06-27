@@ -104,16 +104,19 @@ namespace App2.ViewModels
                         var product = group.First().Product;
                         if (product == null) continue;
 
-                        var activeRecord = group.FirstOrDefault(i => i.Quantity > 0);
-                        if (activeRecord == null) continue;
-
+                        // نحصل على آخر سجل مخزون (بناءً على تاريخ الإضافة)
+                        var latestRecord = group.OrderByDescending(i => i.DateAdded).FirstOrDefault();
+                        
                         var summaryItem = new InventorySummaryItem
                         {
                             ProductId = product.Id,
                             ColorNumber = product.ColorNumber,
                             Color = product.Color ?? string.Empty,
-                            TotalQuantity = activeRecord.Quantity
+                            TotalQuantity = latestRecord?.Quantity ?? 0
                         };
+                        summaryItem.SetOriginalColorNumber(product.ColorNumber);
+                        summaryItem.SetOriginalColor(product.Color ?? string.Empty);
+                        summaryItem.SetAsLoaded();
 
                         result.Add(summaryItem);
                     }

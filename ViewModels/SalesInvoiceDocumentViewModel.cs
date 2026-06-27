@@ -177,6 +177,12 @@ namespace App2.ViewModels
                 return false;
             }
 
+            // If payment includes transfer, transfer number is mandatory
+            if (PaidNetwork > 0 && string.IsNullOrWhiteSpace(TransferNumber))
+            {
+                return false;
+            }
+
             return true;
         }
 
@@ -234,7 +240,8 @@ namespace App2.ViewModels
                     Discount = Discount,
                     PaidInCash = PaidCash,
                     Transfer = PaidNetwork,
-                    Deferred = RemainingAmount
+                    Deferred = RemainingAmount,
+                    TransferNumber = TransferNumber
                 };
 
                 // Update Customer's Balance
@@ -375,13 +382,21 @@ namespace App2.ViewModels
                 // 5. إذا كان هناك مدفوع شبكة/تحويل
                 if (PaidNetwork > 0)
                 {
+                    string transferNote = !string.IsNullOrWhiteSpace(TransferNumber) 
+                        ? $"سداد شبكة/تحويل فاتورة {InvoiceNumber} - {SelectedCustomer.Name} | رقم الحوالة: {TransferNumber}" 
+                        : $"سداد شبكة/تحويل فاتورة {InvoiceNumber} - {SelectedCustomer.Name}";
+                        
+                    string customerTransferNote = !string.IsNullOrWhiteSpace(TransferNumber) 
+                        ? $"سداد شبكة/تحويل - فاتورة {InvoiceNumber} | رقم الحوالة: {TransferNumber}" 
+                        : $"سداد شبكة/تحويل - فاتورة {InvoiceNumber}";
+                        
                     // مدين: حساب التحويلات
                     lines.Add(new FinancialTransactionLine
                     {
                         AccountId = transferAccount.Id,
                         Debit = PaidNetwork,
                         Credit = 0,
-                        Notes = $"سداد شبكة/تحويل فاتورة {InvoiceNumber} - {SelectedCustomer.Name}"
+                        Notes = transferNote
                     });
 
                     // دائن: العميل
@@ -392,7 +407,7 @@ namespace App2.ViewModels
                             AccountId = SelectedCustomer.AccountId.Value,
                             Debit = 0,
                             Credit = PaidNetwork,
-                            Notes = $"سداد شبكة/تحويل - فاتورة {InvoiceNumber}"
+                            Notes = customerTransferNote
                         });
                     }
                 }
@@ -573,6 +588,13 @@ namespace App2.ViewModels
                 }
             }
         }
+        
+        private string? _transferNumber;
+        public string? TransferNumber
+        {
+            get => _transferNumber;
+            set => SetProperty(ref _transferNumber, value);
+        }
 
         private decimal _discount;
         public decimal Discount
@@ -709,6 +731,7 @@ namespace App2.ViewModels
         {
             var detail = new SalesInvoiceDetail
             {
+                ProductId = batch.ProductId,
                 ThreadNumber = batch.Product?.ColorNumber ?? "",
                 ItemName = batch.Product?.Color ?? "",
                 Quantity = 1,

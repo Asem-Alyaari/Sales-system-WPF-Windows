@@ -67,6 +67,10 @@
         <!-- Filters -->
         <Border Grid.Row="1" Style="{StaticResource CardStyle}">
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
@@ -74,7 +78,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <ComboBox Grid.Column="0" 
+                <ComboBox Grid.Row="0" Grid.Column="0" 
                           x:Name="CustomerCombo"
                           ItemsSource="{Binding Customers}" 
                           SelectedItem="{Binding SelectedCustomer}"
@@ -162,11 +166,29 @@
                            BorderBrush="#CBD5E1"
                            Background="#F8FAFC"/>
 
-                <Button Grid.Column="3" 
+                <Button Grid.Row="0" Grid.Column="3" 
                        Content="🔄 تحديث" 
                        Style="{StaticResource PrimaryBtn}"
                        Margin="12,0,0,0"
                        Click="Refresh_Click"/>
+                
+                <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Height="40" Padding="10,0"
+                         Margin="0,12,0,0"
+                         FontSize="14"
+                         BorderBrush="#CBD5E1"
+                         Background="#F8FAFC">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Foreground" Value="#94A3B8"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
             </Grid>
         </Border>
 
@@ -177,31 +199,23 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <Border Grid.Column="0" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20" Margin="0,0,8,0">
-                    <StackPanel>
-                        <TextBlock Text="الرصيد الافتتاحي" FontSize="14" Foreground="#64748B" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding OpeningBalance, StringFormat=N2}" FontSize="24" FontWeight="Black" Foreground="#0F172A" Margin="0,8,0,0"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20" Margin="0,0,8,0">
                     <StackPanel>
                         <TextBlock Text="إجمالي المدين" FontSize="14" Foreground="#64748B" FontWeight="Bold"/>
                         <TextBlock Text="{Binding TotalDebit, StringFormat=N2}" FontSize="24" FontWeight="Black" Foreground="#10B981" Margin="0,8,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="2" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20" Margin="0,0,8,0">
+                <Border Grid.Column="1" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20" Margin="0,0,8,0">
                     <StackPanel>
                         <TextBlock Text="إجمالي الدائن" FontSize="14" Foreground="#64748B" FontWeight="Bold"/>
                         <TextBlock Text="{Binding TotalCredit, StringFormat=N2}" FontSize="24" FontWeight="Black" Foreground="#EF4444" Margin="0,8,0,0"/>
                     </StackPanel>
                 </Border>
 
-                <Border Grid.Column="3" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20">
+                <Border Grid.Column="2" Background="White" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="20">
                     <StackPanel>
                         <TextBlock Text="الرصيد النهائي" FontSize="14" Foreground="#64748B" FontWeight="Bold"/>
                         <TextBlock Text="{Binding ClosingBalance, StringFormat=N2}" FontSize="24" FontWeight="Black" Foreground="#3B82F6" Margin="0,8,0,0"/>

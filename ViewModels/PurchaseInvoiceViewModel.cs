@@ -10,18 +10,34 @@ namespace App2.ViewModels
 {
     public class PurchaseInvoiceViewModel : ObservableObject
     {
+        // حدث طلب إغلاق النافذة
+        public event EventHandler? RequestClose;
+        
         private string _invoiceNumber = string.Empty;
         private DateTime _invoiceDate = DateTime.Now;
         private string _containerNumber = string.Empty;
         private string? _category;
+        private bool _isPosted;
+        private int? _existingInvoiceId;
         private ObservableCollection<Product> _suggestedProducts;
         private readonly AppDbContext _dbContext;
+        
+        public bool IsPosted
+        {
+            get => _isPosted;
+            set => SetProperty(ref _isPosted, value);
+        }
 
         public string InvoiceNumber
         {
             get => _invoiceNumber;
             set => SetProperty(ref _invoiceNumber, value);
         }
+
+        public bool IsEditMode => _existingInvoiceId.HasValue;
+
+        public string Title => IsEditMode ? "تعديل فاتورة شراء" : "إضافة فاتورة شراء";
+        public string ClearButtonText => IsEditMode ? "إلغاء" : "مسح الحقول";
 
         public DateTime InvoiceDate
         {
@@ -69,6 +85,38 @@ namespace App2.ViewModels
 
             // توليد رقم الفاتورة تلقائياً
             InvoiceNumber = GenerateInvoiceNumber();
+        }
+
+        public PurchaseInvoiceViewModel(PurchaseInvoice invoice) : this()
+        {
+            // مسح التتبع حتى لا تحمل أي تعديلات قديمة من التتبع
+            _dbContext.ChangeTracker.Clear();
+            
+            _existingInvoiceId = invoice.Id;
+            InvoiceNumber = invoice.InvoiceNumber;
+            InvoiceDate = invoice.InvoiceDate;
+            ContainerNumber = invoice.ContainerNumber ?? string.Empty;
+            Category = invoice.Category;
+            IsPosted = invoice.IsPosted;
+
+            InvoiceItems.Clear();
+            foreach (var item in invoice.Items)
+            {
+                InvoiceItems.Add(new PurchaseInvoiceItem
+                {
+                    Id = 0, // Reset to 0 so they are treated as new if added back
+                    BoxNumber = item.BoxNumber,
+                    Color = item.Color,
+                    Quantity = item.Quantity,
+                    Unit = item.Unit,
+                    PurchaseInvoiceId = 0
+                });
+            }
+            
+            OnPropertyChanged(nameof(IsEditMode));
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(ClearButtonText));
+            OnPropertyChanged(nameof(IsPosted));
         }
 
         private string GenerateInvoiceNumber()
@@ -159,16 +207,90 @@ namespace App2.ViewModels
 
             try
             {
-                var invoice = new PurchaseInvoice
-                {
-                    InvoiceNumber = InvoiceNumber,
-                    InvoiceDate = InvoiceDate,
-                    ContainerNumber = ContainerNumber,
-                    Category = Category
-                };
+                PurchaseInvoice invoice;
+                var productQuantities = new Dictionary<string, int>(); // key: box number, value: quantity in kabba
 
-                _dbContext.PurchaseInvoices.Add(invoice);
-                _dbContext.SaveChanges();
+                if (IsEditMode)
+                {
+                    invoice = _dbContext.PurchaseInvoices
+                        .Include(i => i.Items)
+                        .FirstOrDefault(i => i.Id == _existingInvoiceId)
+                        ?? throw new Exception("لم يتم العثور على الفاتورة الأصلية في قاعدة البيانات");
+
+                    // First, calculate old quantities per product
+                    foreach (var oldItem in invoice.Items)
+                    {
+                        int oldQuantityInKabba = oldItem.Unit == "كرتون" ? oldItem.Quantity * Inventory.KabbaPerCarton : oldItem.Quantity;
+                        if (productQuantities.ContainsKey(oldItem.BoxNumber))
+                            productQuantities[oldItem.BoxNumber] -= oldQuantityInKabba;
+                        else
+                            productQuantities[oldItem.BoxNumber] = -oldQuantityInKabba;
+                    }
+
+                    // Then calculate new quantities per product
+                    foreach (var newItem in validItems)
+                    {
+                        int newQuantityInKabba = newItem.Unit == "كرتون" ? newItem.Quantity * Inventory.KabbaPerCarton : newItem.Quantity;
+                        if (productQuantities.ContainsKey(newItem.BoxNumber))
+                            productQuantities[newItem.BoxNumber] += newQuantityInKabba;
+                        else
+                            productQuantities[newItem.BoxNumber] = newQuantityInKabba;
+                    }
+
+                    // Now check inventory for each product
+                    foreach (var kvp in productQuantities)
+                    {
+                        var product = _dbContext.Products.FirstOrDefault(p => p.ColorNumber == kvp.Key);
+                        if (product != null)
+                        {
+                            var inventoryRecord = _dbContext.Inventories.FirstOrDefault(i => i.ProductId == product.Id);
+                            int currentInventory = inventoryRecord?.Quantity ?? 0;
+                            int newInventory = currentInventory + kvp.Value;
+                            if (newInventory < 0)
+                            {
+                                System.Windows.MessageBox.Show($"الكمية في المخزون للصنف {kvp.Key} لا تكفي. الكمية المتاحة: {currentInventory} كبة، المطلوبة: {Math.Abs(kvp.Value)} كبة", "خطأ", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+                                return;
+                            }
+                        }
+                    }
+
+                    // Now adjust inventory
+                    foreach (var oldItem in invoice.Items)
+                    {
+                        var product = _dbContext.Products.FirstOrDefault(p => p.ColorNumber == oldItem.BoxNumber);
+                        if (product != null)
+                        {
+                            var inventoryRecord = _dbContext.Inventories.FirstOrDefault(i => i.ProductId == product.Id);
+                            if (inventoryRecord != null)
+                            {
+                                int oldQuantityInKabba = oldItem.Unit == "كرتون" ? oldItem.Quantity * Inventory.KabbaPerCarton : oldItem.Quantity;
+                                inventoryRecord.Quantity -= oldQuantityInKabba;
+                            }
+                        }
+                    }
+
+                    // تحديث بيانات الفاتورة الأساسية
+                    invoice.InvoiceNumber = InvoiceNumber;
+                    invoice.InvoiceDate = InvoiceDate;
+                    invoice.ContainerNumber = ContainerNumber;
+                    invoice.Category = Category;
+
+                    // حذف الأصناف القديمة (سيتم إضافة الجديدة في الخطوة التالية)
+                    _dbContext.PurchaseInvoiceItems.RemoveRange(invoice.Items);
+                }
+                else
+                {
+                    invoice = new PurchaseInvoice
+                    {
+                        InvoiceNumber = InvoiceNumber,
+                        InvoiceDate = InvoiceDate,
+                        ContainerNumber = ContainerNumber,
+                        Category = Category
+                    };
+                    _dbContext.PurchaseInvoices.Add(invoice);
+                    // حفظ الفاتورة الجديدة للحصول على معرفها (ID)
+                    _dbContext.SaveChanges();
+                }
 
                 var newProductsCache = new Dictionary<string, Product>();
 
@@ -234,7 +356,15 @@ namespace App2.ViewModels
                 _dbContext.SaveChanges();
 
                 System.Windows.MessageBox.Show("تم حفظ الفاتورة بنجاح", "نجاح", System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Information);
-                ClearFields();
+                
+                if (IsEditMode)
+                {
+                    RequestClose?.Invoke(this, EventArgs.Empty);
+                }
+                else
+                {
+                    ClearFields();
+                }
             }
             catch (Exception ex)
             {
@@ -260,26 +390,47 @@ namespace App2.ViewModels
 
         private void ExecuteClear(object? parameter)
         {
-            var result = System.Windows.MessageBox.Show(
-                "هل أنت متأكد من مسح جميع الحقول؟",
-                "تأكيد المسح",
-                System.Windows.MessageBoxButton.YesNo,
-                System.Windows.MessageBoxImage.Warning,
-                System.Windows.MessageBoxResult.No);
-
-            if (result == System.Windows.MessageBoxResult.Yes)
+            if (IsEditMode)
             {
-                ClearFields();
+                var result = System.Windows.MessageBox.Show(
+                    "هل تريد إلغاء التعديل وإغلاق النافذة؟",
+                    "تأكيد الإلغاء",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No);
+
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    RequestClose?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            else
+            {
+                var result = System.Windows.MessageBox.Show(
+                    "هل أنت متأكد من مسح جميع الحقول؟",
+                    "تأكيد المسح",
+                    System.Windows.MessageBoxButton.YesNo,
+                    System.Windows.MessageBoxImage.Warning,
+                    System.Windows.MessageBoxResult.No);
+
+                if (result == System.Windows.MessageBoxResult.Yes)
+                {
+                    ClearFields();
+                }
             }
         }
 
         private void ClearFields()
         {
+            _existingInvoiceId = null;
             InvoiceNumber = GenerateInvoiceNumber();
             InvoiceDate = DateTime.Now;
             ContainerNumber = string.Empty;
             Category = null;
             InvoiceItems.Clear();
+            OnPropertyChanged(nameof(IsEditMode));
+            OnPropertyChanged(nameof(Title));
+            OnPropertyChanged(nameof(ClearButtonText));
         }
     }
 }

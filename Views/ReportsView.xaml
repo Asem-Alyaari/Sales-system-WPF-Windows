@@ -28,7 +28,8 @@
             <Setter Property="CornerRadius" Value="6"/>
             <Setter Property="BorderBrush" Value="#10B981"/>
             <Setter Property="BorderThickness" Value="4,0,0,0"/>
-            <Setter Property="Padding" Value="16,12"/>
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="MinWidth" Value="200"/>
             <Setter Property="Effect">
                 <Setter.Value>
                     <DropShadowEffect Color="#0F172A" Opacity="0.03" BlurRadius="6" ShadowDepth="1"/>
@@ -132,104 +133,116 @@
                     VerticalAlignment="Center"/>
         </Grid>
 
-        <!-- DATE FILTER -->
+        <!-- DATE FILTER & SEARCH -->
         <Border Grid.Row="1" Style="{StaticResource ModernCard}" Margin="0,0,0,12" Padding="16">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="150"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="150"/>
+                    <ColumnDefinition Width="16"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Text="من تاريخ:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
-                <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <DatePicker Grid.Column="1" SelectedDate="{Binding StartDate}" VerticalAlignment="Center"/>
                 
-                <TextBlock Grid.Column="2" Text="إلى تاريخ:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
+                <TextBlock Grid.Column="2" Text="إلى تاريخ:" VerticalAlignment="Center" Margin="16,0,8,0" FontWeight="Bold" Foreground="#334155"/>
                 <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" VerticalAlignment="Center"/>
+                
+                <!-- SEARCH BOX -->
+                <Border Grid.Column="5" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6" Background="#F8FAFC">
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                             FontSize="14" 
+                             Padding="10" 
+                             BorderThickness="0" 
+                             Background="Transparent">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Foreground" Value="#94A3B8"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                </Border>
+                <TextBlock Grid.Column="5" Text="🔍 ابحث عن الصنف (رقم أو اللون)..." 
+                           IsHitTestVisible="False" 
+                           VerticalAlignment="Center" 
+                           Margin="22,0,0,0" 
+                           Foreground="#94A3B8" 
+                           FontSize="14">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SearchText}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
             </Grid>
         </Border>
 
         <!-- FINANCIAL SUMMARY CARDS -->
-        <Grid Grid.Row="2" Margin="0,0,0,12">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Style="{StaticResource EmeraldStatCard}" Margin="0,0,4,0" BorderBrush="#10B981">
+        <WrapPanel Grid.Row="2" Margin="0,0,0,12" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="0,0,4,4" BorderBrush="#10B981">
                 <StackPanel>
                     <TextBlock Text="البيع النقدي" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayCashSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="1" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#F59E0B">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,4" BorderBrush="#F59E0B">
                 <StackPanel>
                     <TextBlock Text="البيع الآجل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayDeferredSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="2" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#3B82F6">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,4" BorderBrush="#3B82F6">
                 <StackPanel>
                     <TextBlock Text="البيع التحويل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayTransferSales}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="3" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#8B5CF6">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,4" BorderBrush="#EF4444">
+                <StackPanel>
+                    <TextBlock Text="المرتجعات النقدية" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
+                    <TextBlock Text="{Binding FinancialSummary.DisplayCashReturns}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,4" BorderBrush="#8B5CF6">
                 <StackPanel>
                     <TextBlock Text="السداد النقدي" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayCashPayments}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="4" Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,0" BorderBrush="#EC4899">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,4,4" BorderBrush="#EC4899">
                 <StackPanel>
                     <TextBlock Text="السداد التحويل" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayTransferPayments}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
 
-            <Border Grid.Column="5" Style="{StaticResource EmeraldStatCard}" Margin="4,0,0,0" BorderBrush="#6366F1">
+            <Border Style="{StaticResource EmeraldStatCard}" Margin="4,0,0,4" BorderBrush="#6366F1">
                 <StackPanel>
                     <TextBlock Text="إجمالي الكمية المباعة" FontSize="13" FontWeight="SemiBold" Foreground="#64748B" Margin="0,0,0,6"/>
                     <TextBlock Text="{Binding FinancialSummary.DisplayTotalQuantitySold}" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Border>
-        </Grid>
-
-        <!-- TOTAL SUMMARY -->
-        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Margin="0,0,0,12" Padding="16">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Border Grid.Column="0" Background="#D1FAE5" CornerRadius="8" Padding="16" Margin="0,0,8,0">
-                    <StackPanel>
-                        <TextBlock Text="إجمالي المبيعات" FontSize="14" FontWeight="SemiBold" Foreground="#065F46" Margin="0,0,0,8"/>
-                        <TextBlock Text="{Binding FinancialSummary.DisplayTotalSales}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                    </StackPanel>
-                </Border>
-
-                <Border Grid.Column="1" Background="#DBEAFE" CornerRadius="8" Padding="16" Margin="8,0,0,0">
-                    <StackPanel>
-                        <TextBlock Text="إجمالي المدفوعات" FontSize="14" FontWeight="SemiBold" Foreground="#1E40AF" Margin="0,0,0,8"/>
-                        <TextBlock Text="{Binding FinancialSummary.DisplayTotalPayments}" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-                    </StackPanel>
-                </Border>
-            </Grid>
-        </Border>
+        </WrapPanel>
 
         <!-- PRODUCT SALES TABLE -->
-        <Border Grid.Row="4" Style="{StaticResource ModernCard}" Padding="4">
+        <Border Grid.Row="3" Style="{StaticResource ModernCard}" Padding="4">
             <Grid>
                 <!-- Loading Indicator -->
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Panel.ZIndex="10">
@@ -264,6 +277,18 @@
                           VerticalContentAlignment="Center">
 
                     <DataGrid.Columns>
+                        <DataGridTextColumn Header="رقم الصنق"
+                                            Binding="{Binding ColorNumber}"
+                                            Width="150">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="15"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
                         <DataGridTextColumn Header="الصنف"
                                             Binding="{Binding Color}"
                                             Width="*">

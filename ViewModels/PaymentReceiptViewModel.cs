@@ -16,6 +16,7 @@ namespace App2.ViewModels
         private string? _notes;
         private DateTime _paymentDate;
         private bool _isSaveEnabled;
+        private string? _transferNumber;
         
         public event Action? PaymentSaved;
 
@@ -45,8 +46,29 @@ namespace App2.ViewModels
         public string PaymentType
         {
             get => _paymentType;
-            set => SetProperty(ref _paymentType, value);
+            set
+            {
+                if (SetProperty(ref _paymentType, value))
+                {
+                    OnPropertyChanged(nameof(IsTransferPayment));
+                    CheckSaveButton();
+                }
+            }
         }
+
+        public string? TransferNumber
+        {
+            get => _transferNumber;
+            set
+            {
+                if (SetProperty(ref _transferNumber, value))
+                {
+                    CheckSaveButton();
+                }
+            }
+        }
+
+        public bool IsTransferPayment => PaymentType == "تحويل";
 
         public string? Notes
         {
@@ -70,7 +92,15 @@ namespace App2.ViewModels
 
         private void CheckSaveButton()
         {
-            IsSaveEnabled = SelectedCustomer != null && SelectedCustomer.AccountId.HasValue && PaymentAmount > 0;
+            bool isValid = SelectedCustomer != null && SelectedCustomer.AccountId.HasValue && PaymentAmount > 0;
+            
+            // If payment type is transfer, transfer number is mandatory
+            if (PaymentType == "تحويل" && string.IsNullOrWhiteSpace(TransferNumber))
+            {
+                isValid = false;
+            }
+            
+            IsSaveEnabled = isValid;
         }
 
         private bool CanExecuteSavePayment(object? parameter) => IsSaveEnabled;
@@ -135,14 +165,20 @@ namespace App2.ViewModels
                         Credit = 0,
                         Notes = PaymentType == "نقدي" 
                             ? $"سداد نقدي من العميل {SelectedCustomer.Name}" 
-                            : $"سداد تحويل من العميل {SelectedCustomer.Name}"
+                            : (!string.IsNullOrWhiteSpace(TransferNumber) 
+                                ? $"سداد تحويل من العميل {SelectedCustomer.Name} | رقم الحوالة: {TransferNumber}" 
+                                : $"سداد تحويل من العميل {SelectedCustomer.Name}")
                     },
                     new FinancialTransactionLine
                     {
                         AccountId = customerAccountId,
                         Debit = 0,
                         Credit = PaymentAmount,
-                        Notes = $"سداد مديونية"
+                        Notes = PaymentType == "نقدي" 
+                            ? $"سداد مديونية" 
+                            : (!string.IsNullOrWhiteSpace(TransferNumber) 
+                                ? $"سداد مديونية | رقم الحوالة: {TransferNumber}" 
+                                : $"سداد مديونية")
                     }
                 };
 

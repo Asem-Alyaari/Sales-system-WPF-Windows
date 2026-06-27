@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace App2.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class NewDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,15 +45,33 @@ namespace App2.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "IssuedKeys",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    LicenseKey = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsUsed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_IssuedKeys", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Licenses",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    LicenseKey = table.Column<string>(type: "TEXT", maxLength: 2048, nullable: false),
                     HardwareId = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     MachineName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     FirstActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastActivatedDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ExpiryDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     Notes = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
@@ -85,7 +103,8 @@ namespace App2.Migrations
                     InvoiceNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     InvoiceDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     ContainerNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    Category = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true)
+                    Category = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    IsPosted = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -102,6 +121,7 @@ namespace App2.Migrations
                     Password = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     FullName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Role = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -220,7 +240,8 @@ namespace App2.Migrations
                     Discount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaidInCash = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Deferred = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Transfer = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Transfer = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransferNumber = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -254,6 +275,73 @@ namespace App2.Migrations
                         name: "FK_SalesInvoiceDetails_SalesInvoices_SalesInvoiceId",
                         column: x => x.SalesInvoiceId,
                         principalTable: "SalesInvoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesReturns",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ReturnNumber = table.Column<string>(type: "TEXT", nullable: false),
+                    ReturnDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalesInvoiceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CustomerId = table.Column<int>(type: "INTEGER", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "TEXT", nullable: false),
+                    Notes = table.Column<string>(type: "TEXT", nullable: true),
+                    PaymentMethod = table.Column<int>(type: "INTEGER", nullable: false),
+                    TransferNumber = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesReturns", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesReturns_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SalesReturns_SalesInvoices_SalesInvoiceId",
+                        column: x => x.SalesInvoiceId,
+                        principalTable: "SalesInvoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SalesReturnDetails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    SalesReturnId = table.Column<int>(type: "INTEGER", nullable: false),
+                    SalesInvoiceDetailId = table.Column<int>(type: "INTEGER", nullable: true),
+                    ThreadNumber = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
+                    MaxReturnQuantityKabba = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OriginalUnit = table.Column<string>(type: "TEXT", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Unit = table.Column<string>(type: "TEXT", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ItemName = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesReturnDetails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesReturnDetails_SalesInvoiceDetails_SalesInvoiceDetailId",
+                        column: x => x.SalesInvoiceDetailId,
+                        principalTable: "SalesInvoiceDetails",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SalesReturnDetails_SalesReturns_SalesReturnId",
+                        column: x => x.SalesReturnId,
+                        principalTable: "SalesReturns",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -299,6 +387,26 @@ namespace App2.Migrations
                 name: "IX_SalesInvoices_CustomerId",
                 table: "SalesInvoices",
                 column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesReturnDetails_SalesInvoiceDetailId",
+                table: "SalesReturnDetails",
+                column: "SalesInvoiceDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesReturnDetails_SalesReturnId",
+                table: "SalesReturnDetails",
+                column: "SalesReturnId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesReturns_CustomerId",
+                table: "SalesReturns",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesReturns_SalesInvoiceId",
+                table: "SalesReturns",
+                column: "SalesInvoiceId");
         }
 
         /// <inheritdoc />
@@ -311,13 +419,16 @@ namespace App2.Migrations
                 name: "Inventories");
 
             migrationBuilder.DropTable(
+                name: "IssuedKeys");
+
+            migrationBuilder.DropTable(
                 name: "Licenses");
 
             migrationBuilder.DropTable(
                 name: "PurchaseInvoiceItems");
 
             migrationBuilder.DropTable(
-                name: "SalesInvoiceDetails");
+                name: "SalesReturnDetails");
 
             migrationBuilder.DropTable(
                 name: "Users");
@@ -330,6 +441,12 @@ namespace App2.Migrations
 
             migrationBuilder.DropTable(
                 name: "PurchaseInvoices");
+
+            migrationBuilder.DropTable(
+                name: "SalesInvoiceDetails");
+
+            migrationBuilder.DropTable(
+                name: "SalesReturns");
 
             migrationBuilder.DropTable(
                 name: "SalesInvoices");

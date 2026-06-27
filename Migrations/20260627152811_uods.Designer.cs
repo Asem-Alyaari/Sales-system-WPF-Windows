@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App2.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260623010806_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260627152811_uods")]
+    partial class uods
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -174,11 +174,39 @@ namespace App2.Migrations
                     b.ToTable("Inventories");
                 });
 
+            modelBuilder.Entity("App2.Models.IssuedKey", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LicenseKey")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("IssuedKeys");
+                });
+
             modelBuilder.Entity("App2.Models.License", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ExpiryDate")
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FirstActivatedDate")
                         .HasColumnType("TEXT");
@@ -192,6 +220,11 @@ namespace App2.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("LastActivatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LicenseKey")
+                        .IsRequired()
+                        .HasMaxLength(2048)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("MachineName")
@@ -249,6 +282,9 @@ namespace App2.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPosted")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -321,6 +357,9 @@ namespace App2.Migrations
                     b.Property<decimal>("Transfer")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<string>("TransferNumber")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -367,6 +406,100 @@ namespace App2.Migrations
                     b.ToTable("SalesInvoiceDetails");
                 });
 
+            modelBuilder.Entity("App2.Models.SalesReturn", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ReturnDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReturnNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SalesInvoiceId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TransferNumber")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("SalesInvoiceId");
+
+                    b.ToTable("SalesReturns");
+                });
+
+            modelBuilder.Entity("App2.Models.SalesReturnDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ItemName")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("MaxReturnQuantityKabba")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("OriginalUnit")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("SalesInvoiceDetailId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SalesReturnId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ThreadNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SalesInvoiceDetailId");
+
+                    b.HasIndex("SalesReturnId");
+
+                    b.ToTable("SalesReturnDetails");
+                });
+
             modelBuilder.Entity("App2.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -390,6 +523,11 @@ namespace App2.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(20)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Username")
@@ -474,6 +612,43 @@ namespace App2.Migrations
                     b.Navigation("SalesInvoice");
                 });
 
+            modelBuilder.Entity("App2.Models.SalesReturn", b =>
+                {
+                    b.HasOne("App2.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("App2.Models.SalesInvoice", "SalesInvoice")
+                        .WithMany()
+                        .HasForeignKey("SalesInvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("SalesInvoice");
+                });
+
+            modelBuilder.Entity("App2.Models.SalesReturnDetail", b =>
+                {
+                    b.HasOne("App2.Models.SalesInvoiceDetail", "SalesInvoiceDetail")
+                        .WithMany()
+                        .HasForeignKey("SalesInvoiceDetailId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("App2.Models.SalesReturn", "SalesReturn")
+                        .WithMany("Details")
+                        .HasForeignKey("SalesReturnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesInvoiceDetail");
+
+                    b.Navigation("SalesReturn");
+                });
+
             modelBuilder.Entity("App2.Models.Account", b =>
                 {
                     b.Navigation("TransactionLines");
@@ -490,6 +665,11 @@ namespace App2.Migrations
                 });
 
             modelBuilder.Entity("App2.Models.SalesInvoice", b =>
+                {
+                    b.Navigation("Details");
+                });
+
+            modelBuilder.Entity("App2.Models.SalesReturn", b =>
                 {
                     b.Navigation("Details");
                 });

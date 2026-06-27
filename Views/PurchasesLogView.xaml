@@ -106,7 +106,7 @@
             <Setter Property="Padding" Value="10,0"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
             <Setter Property="BorderBrush" Value="#E2E8F0"/>
-            <Setter Property="HorizontalContentAlignment" Value="Right"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
         </Style>
         
         <Style TargetType="DataGridCell">
@@ -130,7 +130,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="24">
+    <Grid Margin="25">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -155,7 +155,10 @@
                     </StackPanel>
                 </StackPanel>
 
-                <Button Grid.Column="1" Content="➕ إضافة فاتورة شراء" Command="{Binding AddInvoiceCommand}" Style="{StaticResource EmeraldBtn}" Width="180"/>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="➕ إضافة فاتورة شراء" Command="{Binding AddInvoiceCommand}" Style="{StaticResource EmeraldBtn}" Width="180" Margin="0,0,8,0"/>
+                    <Button Content="📥 ترحيل الكل" Command="{Binding PostAllInvoicesCommand}" Style="{StaticResource EmeraldBtn}" Background="#2196F3" Width="140"/>
+                </StackPanel>
             </Grid>
         </Border>
 
@@ -176,7 +179,7 @@
                 <TextBlock Grid.Column="2" Text="إلى:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="Bold" Foreground="#334155"/>
                 <DatePicker Grid.Column="3" SelectedDate="{Binding EndDate}" VerticalAlignment="Center" Margin="0,0,16,0" Width="120"/>
 
-                <TextBox Grid.Column="4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Column="4" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"/>
                 <TextBlock Grid.Column="4" Text="ابحث برقم الفاتورة أو الحاوية..." Foreground="#94A3B8" IsHitTestVisible="False" VerticalAlignment="Center" Margin="15,0,0,0">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -194,27 +197,52 @@
 
         <!-- DataGrid -->
         <Border Grid.Row="2" Style="{StaticResource ModernCard}">
-            <DataGrid ItemsSource="{Binding Invoices}">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="رقم الفاتورة" Binding="{Binding InvoiceNumber}" Width="*"/>
-                    <DataGridTextColumn Header="التاريخ" Binding="{Binding InvoiceDate, StringFormat=yyyy/MM/dd}" Width="*"/>
-                    <DataGridTextColumn Header="رقم الحاوية" Binding="{Binding ContainerNumber}" Width="*"/>
-                    <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="*"/>
-                    
-                    <DataGridTemplateColumn Width="100">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="👁️ عرض" 
-                                        Command="{Binding DataContext.ViewInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
-                                        CommandParameter="{Binding}"
-                                        Style="{StaticResource EmeraldBtn}"
-                                        Padding="10,5"
-                                        Height="Auto"/>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                <DataGrid ItemsSource="{Binding Invoices}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="رقم الفاتورة" Binding="{Binding InvoiceNumber}" Width="*"/>
+                        <DataGridTextColumn Header="التاريخ" Binding="{Binding InvoiceDate, StringFormat=yyyy/MM/dd}" Width="*"/>
+                        <DataGridTextColumn Header="رقم الحاوية" Binding="{Binding ContainerNumber}" Width="*"/>
+                        <DataGridTextColumn Header="التصنيف" Binding="{Binding Category}" Width="*"/>
+                        <DataGridTextColumn Header="الحالة" Binding="{Binding StatusText}" Width="120"/>
+                        
+                        <DataGridTemplateColumn Width="280">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="👁️ عرض" 
+                                                Command="{Binding DataContext.ViewInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource EmeraldBtn}"
+                                                Padding="10,5"
+                                                Height="Auto"
+                                                Margin="0,0,5,0"/>
+                                        <Button x:Name="EditBtn" Content="✏️ تعديل" 
+                                                Command="{Binding DataContext.EditInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}"
+                                                Background="#F59E0B"
+                                                Style="{StaticResource EmeraldBtn}"
+                                                Padding="10,5"
+                                                Height="Auto"
+                                                Margin="0,0,5,0"/>
+                                        <Button x:Name="PostBtn" Content="📥 ترحيل" 
+                                                Command="{Binding DataContext.PostInvoiceCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}" 
+                                                CommandParameter="{Binding}"
+                                                Background="#2196F3"
+                                                Style="{StaticResource EmeraldBtn}"
+                                                Padding="10,5"
+                                                Height="Auto"/>
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding IsPosted}" Value="True">
+                                            <Setter TargetName="EditBtn" Property="Visibility" Value="Collapsed"/>
+                                            <Setter TargetName="PostBtn" Property="Visibility" Value="Collapsed"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
         </Border>
     </Grid>
 </UserControl>

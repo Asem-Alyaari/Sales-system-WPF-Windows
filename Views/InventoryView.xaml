@@ -286,7 +286,7 @@
                           AutoGenerateColumns="False"
                           CanUserAddRows="False"
                           CanUserDeleteRows="False"
-                          GridLinesVisibility="None"
+                          GridLinesVisibility="Horizontal"
                           HeadersVisibility="Column"
                           AlternationCount="2"
                           RowStyle="{StaticResource EmeraldRow}"
@@ -294,13 +294,14 @@
                           BorderThickness="0"
                           Background="Transparent"
                           SelectionMode="Single"
-                          SelectionUnit="FullRow"
+                          SelectionUnit="CellOrRowHeader"
                           VerticalContentAlignment="Center">
 
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="رقم الخيط"
-                                            Binding="{Binding ColorNumber}"
-                                            Width="140">
+                                            Binding="{Binding ColorNumber, UpdateSourceTrigger=LostFocus}"
+                                            Width="140"
+                                            IsReadOnly="False">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -310,11 +311,22 @@
                                     <Setter Property="Foreground" Value="#0F172A"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Setter Property="FontSize" Value="16"/>
+                                    <Setter Property="Background" Value="#D1FAE5"/>
+                                    <Setter Property="Padding" Value="4"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="اللون / الوصف"
-                                            Binding="{Binding Color}"
-                                            Width="*">
+                                            Binding="{Binding Color, UpdateSourceTrigger=LostFocus}"
+                                            Width="*"
+                                            IsReadOnly="False">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>
@@ -322,11 +334,21 @@
                                     <Setter Property="FontSize" Value="15"/>
                                 </Style>
                             </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.EditingElementStyle>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="HorizontalAlignment" Value="Center"/>
+                                    <Setter Property="VerticalAlignment" Value="Center"/>
+                                    <Setter Property="FontSize" Value="15"/>
+                                    <Setter Property="Background" Value="#D1FAE5"/>
+                                    <Setter Property="Padding" Value="4"/>
+                                </Style>
+                            </DataGridTextColumn.EditingElementStyle>
                         </DataGridTextColumn>
 
                         <DataGridTextColumn Header="الرصيد"
                                             Binding="{Binding DisplayTotalQuantity}"
-                                            Width="200">
+                                            Width="200"
+                                            IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Center"/>

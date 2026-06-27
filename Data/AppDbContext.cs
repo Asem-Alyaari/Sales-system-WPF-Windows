@@ -20,6 +20,8 @@ namespace App2.Data
 
         public DbSet<SalesInvoice> SalesInvoices { get; set; }
         public DbSet<SalesInvoiceDetail> SalesInvoiceDetails { get; set; }
+        public DbSet<SalesReturn> SalesReturns { get; set; }
+        public DbSet<SalesReturnDetail> SalesReturnDetails { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<FinancialTransaction> FinancialTransactions { get; set; }
@@ -33,7 +35,12 @@ namespace App2.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App2Db.db");
+                var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "App2");
+                if (!Directory.Exists(appDataPath))
+                {
+                    Directory.CreateDirectory(appDataPath);
+                }
+                var dbPath = Path.Combine(appDataPath, "App2Db.db");
                 optionsBuilder.UseSqlite($"Data Source={dbPath}");
             }
         }
@@ -49,6 +56,7 @@ namespace App2.Data
             
             modelBuilder.ApplyConfiguration(new SalesInvoiceConfiguration());
             modelBuilder.ApplyConfiguration(new SalesInvoiceDetailConfiguration());
+            modelBuilder.ApplyConfiguration(new SalesReturnDetailConfiguration());
             
             modelBuilder.ApplyConfiguration(new AccountConfiguration());
             modelBuilder.ApplyConfiguration(new FinancialTransactionConfiguration());

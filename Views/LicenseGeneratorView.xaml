@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="مولد مفاتيح الترخيص - للمطور فقط" Height="720" Width="620"
         WindowStartupLocation="CenterScreen" Background="#F8FAFC"
-        FontFamily="Segoe UI" FlowDirection="RightToLeft">
+        FontFamily="Segoe UI" FlowDirection="RightToLeft"> 
 
     <Window.Resources>
         <Style x:Key="BaseControlStyle" TargetType="Control">

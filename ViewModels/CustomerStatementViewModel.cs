@@ -29,6 +29,20 @@ namespace App2.ViewModels
         private decimal _totalDebit;
         private decimal _totalCredit;
         private decimal _closingBalance;
+        private string _searchText = string.Empty;
+        private ObservableCollection<CustomerTransactionItem> _allTransactions = new ObservableCollection<CustomerTransactionItem>();
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (SetProperty(ref _searchText, value))
+                {
+                    FilterTransactions();
+                }
+            }
+        }
 
         public Customer? SelectedCustomer
         {
@@ -139,7 +153,7 @@ namespace App2.ViewModels
 
         private void LoadTransactions()
         {
-            Transactions.Clear();
+            _allTransactions.Clear();
 
             int? accountId = null;
             if (SelectedAccount != null)
@@ -157,6 +171,7 @@ namespace App2.ViewModels
                 TotalDebit = 0;
                 TotalCredit = 0;
                 ClosingBalance = 0;
+                FilterTransactions();
                 return;
             }
 
@@ -199,16 +214,44 @@ namespace App2.ViewModels
                     };
 
                     runningBalance = item.Balance;
-                    Transactions.Add(item);
+                    _allTransactions.Add(item);
                 }
 
                 TotalDebit = periodTransactions.Sum(l => l.Debit);
                 TotalCredit = periodTransactions.Sum(l => l.Credit);
                 ClosingBalance = runningBalance;
+                
+                FilterTransactions();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"خطأ في تحميل الحركات: {ex.Message}", "خطأ", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        
+        private void FilterTransactions()
+        {
+            Transactions.Clear();
+            
+            if (string.IsNullOrWhiteSpace(SearchText))
+            {
+                foreach (var item in _allTransactions)
+                {
+                    Transactions.Add(item);
+                }
+            }
+            else
+            {
+                var searchLower = SearchText.ToLower();
+                foreach (var item in _allTransactions)
+                {
+                    if (item.Description.ToLower().Contains(searchLower) || 
+                        (item.ReferenceType != null && item.ReferenceType.ToLower().Contains(searchLower)) ||
+                        (item.ReferenceId != null && item.ReferenceId.ToString().Contains(searchLower)))
+                    {
+                        Transactions.Add(item);
+                    }
+                }
             }
         }
 

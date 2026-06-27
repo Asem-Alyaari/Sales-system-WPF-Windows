@@ -152,6 +152,9 @@
             <Setter Property="Background" Value="White"/>
             <Setter Property="SnapsToDevicePixels" Value="true"/>
             <Style.Triggers>
+                <DataTrigger Binding="{Binding IsNew}" Value="True">
+                    <Setter Property="Background" Value="#FFF9C4"/>
+                </DataTrigger>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#E8EAF6"/>
                 </Trigger>
@@ -183,7 +186,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="25">
+    <Grid Margin="25" x:Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -192,7 +195,9 @@
 
         <Border Grid.Row="0" Background="White" Padding="20" CornerRadius="8" Margin="0,0,0,20">
             <StackPanel>
-                <TextBlock Text="معلومات الفاتورة الأساسية" FontSize="18" FontWeight="Bold" Foreground="#3F51B5" Margin="0,0,0,15"/>
+                <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="ExtraBold" Foreground="#3F51B5" Margin="0,0,0,20"/>
+                
+                <TextBlock Text="معلومات الفاتورة الأساسية" FontSize="16" FontWeight="Bold" Foreground="#757575" Margin="0,0,0,15"/>
 
                 <UniformGrid Columns="4">
                     <StackPanel Margin="10,0">
@@ -300,7 +305,17 @@
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
             <Button Content="حفظ الفاتورة" Style="{StaticResource PrimaryButtonStyle}" Command="{Binding SaveInvoiceCommand}" Margin="0,0,12,0" Width="160"/>
-            <Button Content="مسح الحقول" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearCommand}" Width="140"/>
+            <Button Content="{Binding ClearButtonText}" Style="{StaticResource SecondaryButtonStyle}" Command="{Binding ClearCommand}" Width="140"/>
         </StackPanel>
+        
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPosted}" Value="True">
+                        <Setter Property="IsEnabled" Value="False"/>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
     </Grid>
 </UserControl>

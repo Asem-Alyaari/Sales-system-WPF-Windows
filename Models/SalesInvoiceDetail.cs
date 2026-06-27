@@ -15,6 +15,9 @@ namespace App2.Models
         public int SalesInvoiceId { get; set; } 
         public SalesInvoice SalesInvoice { get; set; } = null!;
         
+        public int ProductId { get; set; }
+        public Product Product { get; set; } = null!;
+        
         public string ThreadNumber { get; set; } = string.Empty; 
         
         public decimal Quantity 
